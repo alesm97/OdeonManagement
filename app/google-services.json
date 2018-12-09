@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "105459659735",
+    "firebase_url": "https://odeonmanagementapp.firebaseio.com",
+    "project_id": "odeonmanagementapp",
+    "storage_bucket": "odeonmanagementapp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:105459659735:android:dd22e45781eb4d5e",
+        "android_client_info": {
+          "package_name": "com.example.alesm97.odeonmanagement"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "105459659735-tfu0to4460ufq2tis56s5ii5ice3bta1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBsmqFbPqMEAg5uYLhGNbC3lnYojjyZTjg"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

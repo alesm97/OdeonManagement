@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item android:title="E/S"
+        android:id="@+id/bottom_menu_es"
+        android:enabled="true"
+        android:icon="@drawable/ic_import_export_black_24dp"
+        android:titleCondensed="E/S"
+        app:showAsAction="ifRoom"
+        />
+
+    <item android:title="Limpieza"
+        android:id="@+id/bottom_menu_limpieza"
+        android:enabled="true"
+        android:icon="@drawable/ic_limpieza_menu_item"
+        android:titleCondensed="LIM"
+        app:showAsAction="withText"
+        />
+
+    <item android:title="Pasen"
+        android:id="@+id/bottom_menu_pasen"
+        android:enabled="true"
+        android:icon="@drawable/ic_personal_video_black_24dp"
+        android:titleCondensed="PAS"
+        app:showAsAction="withText"
+        />
+
+    <item android:title="Incidencias"
+        android:id="@+id/bottom_menu_incidencias"
+        android:enabled="true"
+        android:icon="@drawable/ic_incidencia_menu_item"
+        android:titleCondensed="INC"
+        app:showAsAction="withText"
+        />
+
+</menu>
