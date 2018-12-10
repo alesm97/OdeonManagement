@@ -7,7 +7,20 @@ public class Sesion {
 
     private String nombrePelicula, codigo;
     private Date horaPelicula;
-    private int anho, dia, mes, hora, minutos, numSesion;
+    private int anho, dia, mes, hora, minutos, numSesion, sala;
+
+    public Sesion(String nombrePelicula, Date horaPelicula, int anho, int dia, int mes, int hora, int minutos, int numSesion, int sala) {
+        this.nombrePelicula = nombrePelicula;
+        this.horaPelicula = horaPelicula;
+        this.anho = anho;
+        this.dia = dia;
+        this.mes = mes;
+        this.hora = hora;
+        this.minutos = minutos;
+        this.numSesion = numSesion;
+        this.sala = sala;
+        codigo = String.format("%d/%d/%d-%d-%d",dia,mes,anho,sala,numSesion);
+    }
 
     public String getNombrePelicula() {
         return nombrePelicula;
@@ -81,6 +94,14 @@ public class Sesion {
         this.numSesion = numSesion;
     }
 
+    public int getSala() {
+        return sala;
+    }
+
+    public void setSala(int sala) {
+        this.sala = sala;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -91,6 +112,7 @@ public class Sesion {
                 mes == sesion.mes &&
                 hora == sesion.hora &&
                 minutos == sesion.minutos &&
+                sala == sesion.sala &&
                 numSesion == sesion.numSesion &&
                 Objects.equals(nombrePelicula, sesion.nombrePelicula) &&
                 Objects.equals(codigo, sesion.codigo) &&
@@ -102,4 +124,5 @@ public class Sesion {
 
         return Objects.hash(nombrePelicula, codigo, horaPelicula, anho, dia, mes, hora, minutos, numSesion);
     }
+
 }

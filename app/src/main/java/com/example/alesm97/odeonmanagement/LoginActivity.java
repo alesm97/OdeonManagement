@@ -22,14 +22,11 @@ public class LoginActivity extends AppCompatActivity {
         binding.setLifecycleOwner(this);
         vm = new LoginViewModel(this.getApplication());
         binding.setLoginvm(vm);
-        vm.success.observe(this, new Observer<Boolean>() {
-            @Override
-            public void onChanged(@Nullable Boolean aBoolean) {
-                if (aBoolean){
-                    Intent intent = new Intent(binding.btnLogin.getContext(),MainActivity.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    startActivity(intent);
-                }
+        vm.success.observe(this, aBoolean -> {
+            if (aBoolean){
+                Intent intent = new Intent(binding.btnLogin.getContext(),MainActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
             }
         });
     }

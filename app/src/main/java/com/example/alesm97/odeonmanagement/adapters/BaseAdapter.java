@@ -7,7 +7,7 @@ import android.view.View;
 import java.util.Collections;
 import java.util.List;
 
-public abstract class BaseAdapter<M, VH extends BaseViewHolder> extends RecyclerView.Adapter {
+public abstract class BaseAdapter<M, VH extends BaseViewHolder> extends RecyclerView.Adapter<VH> {
 
     private List<M> data;
     private OnItemClickListener onItemClickListener;
