@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
         binding.setVm(viewmodel);
         setContentView(R.layout.activity_main);
 
-        getSupportFragmentManager().beginTransaction().replace(R.id.frgLayout,new EsFragment()).commit();
+        //getSupportFragmentManager().beginTransaction().replace(R.id.frgLayout,new EsFragment()).commit();
 
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);

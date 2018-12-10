@@ -17,17 +17,21 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Locale;
 
 public class MainViewModel extends AndroidViewModel {
 
 
     public MutableLiveData<String> hour = new MutableLiveData<>();
+    public MutableLiveData<String> fecha = new MutableLiveData<>();
 
 
     public MainViewModel(@NonNull Application application) {
         super(application);
-        hour.postValue("5845654");
+        fecha.postValue(new Date().toString());
+    }
+
+    public void click (View v){
+        
     }
 
     /*
