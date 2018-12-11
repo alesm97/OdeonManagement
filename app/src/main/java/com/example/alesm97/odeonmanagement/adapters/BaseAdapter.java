@@ -34,10 +34,6 @@ public abstract class BaseAdapter<M, VH extends BaseViewHolder> extends Recycler
                 }
             };
 
-    public BaseAdapter(List<M> data) {
-        this.data = data;
-    }
-
     public void submitList(List<M> data) {
         this.data = data;
         notifyDataSetChanged();

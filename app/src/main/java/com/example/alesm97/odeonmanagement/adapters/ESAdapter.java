@@ -14,13 +14,14 @@ import java.util.List;
 
 public class ESAdapter extends BaseAdapter<Sesion,ESAdapter.ViewHolder> {
 
-    public ESAdapter(List<Sesion> data) {
-        super(data);
+    public ESAdapter() {
+        setHasStableIds(true);
     }
 
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
+
         return new ViewHolder(LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.es_list_item, viewGroup, false));
     }
 

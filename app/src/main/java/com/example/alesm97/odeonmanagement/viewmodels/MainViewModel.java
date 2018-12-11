@@ -1,34 +1,23 @@
 package com.example.alesm97.odeonmanagement.viewmodels;
 
-import android.annotation.SuppressLint;
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
-import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
-import android.os.Build;
-import android.os.Parcel;
-import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
-import android.support.v4.os.LocaleListCompat;
-import android.view.View;
 
-import com.example.alesm97.odeonmanagement.models.UsuarioMin;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
+import com.example.alesm97.odeonmanagement.models.Sesion;
 
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 public class MainViewModel extends AndroidViewModel {
 
 
     public MutableLiveData<String> fecha = new MutableLiveData<>();
+    public MutableLiveData<List<Sesion>> sesiones = new MutableLiveData<>();
     public Watch watch = new Watch();
 
 

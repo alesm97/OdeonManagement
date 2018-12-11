@@ -1,5 +1,6 @@
 package com.example.alesm97.odeonmanagement.models;
 
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Objects;
 
@@ -9,9 +10,9 @@ public class Sesion {
     private Date horaPelicula;
     private int anho, dia, mes, hora, minutos, numSesion, sala;
 
-    public Sesion(String nombrePelicula, Date horaPelicula, int anho, int dia, int mes, int hora, int minutos, int numSesion, int sala) {
+    public Sesion(String nombrePelicula, int anho, int mes, int dia, int hora, int minutos, int numSesion, int sala) {
         this.nombrePelicula = nombrePelicula;
-        this.horaPelicula = horaPelicula;
+        horaPelicula = setHoraPelicula(anho,mes,dia,hora,minutos);
         this.anho = anho;
         this.dia = dia;
         this.mes = mes;
@@ -19,7 +20,7 @@ public class Sesion {
         this.minutos = minutos;
         this.numSesion = numSesion;
         this.sala = sala;
-        codigo = String.format("%d/%d/%d-%d-%d",dia,mes,anho,sala,numSesion);
+        codigo = String.format("%d-%d-%d-%d-%d",dia,mes,anho,sala,numSesion);
     }
 
     public String getNombrePelicula() {
@@ -42,8 +43,16 @@ public class Sesion {
         return horaPelicula;
     }
 
-    public void setHoraPelicula(Date horaPelicula) {
-        this.horaPelicula = horaPelicula;
+    private Date setHoraPelicula(int anho, int mes, int dia, int hora, int minutos) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.YEAR,anho);
+        calendar.set(Calendar.MONTH,mes);
+        calendar.set(Calendar.DAY_OF_MONTH,dia);
+        calendar.set(Calendar.HOUR_OF_DAY,hora);
+        calendar.set(Calendar.MINUTE,minutos);
+        calendar.set(Calendar.SECOND,0);
+
+        return calendar.getTime();
     }
 
     public int getAnho() {
