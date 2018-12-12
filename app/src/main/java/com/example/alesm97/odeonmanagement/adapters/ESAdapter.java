@@ -15,7 +15,7 @@ import java.util.List;
 public class ESAdapter extends BaseAdapter<Sesion,ESAdapter.ViewHolder> {
 
     public ESAdapter() {
-        setHasStableIds(true);
+        //setHasStableIds(true);
     }
 
     @NonNull
@@ -26,15 +26,15 @@ public class ESAdapter extends BaseAdapter<Sesion,ESAdapter.ViewHolder> {
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ESAdapter.ViewHolder viewHolder, int i) {
+    public void onBindViewHolder(@NonNull ViewHolder viewHolder, int i) {
         viewHolder.bind(getItem(i));
     }
 
     class ViewHolder extends BaseViewHolder {
 
-        private final TextView lblNumSala;
-        private final TextView lblNombrePelicula;
-        private final TextView lblHora;
+        private TextView lblNumSala;
+        private TextView lblNombrePelicula;
+        private TextView lblHora;
 
         ViewHolder(View itemView) {
             super(itemView, getOnItemClickListener(), getOnItemLongClickListener());
@@ -43,11 +43,10 @@ public class ESAdapter extends BaseAdapter<Sesion,ESAdapter.ViewHolder> {
             lblHora = ViewCompat.requireViewById(itemView, R.id.lblEsHora);
         }
 
-
-        public void bind(Sesion sesion) {
-            lblNumSala.setText(sesion.getSala());
+        void bind(Sesion sesion) {
             lblNombrePelicula.setText(sesion.getNombrePelicula());
-            lblHora.setText(sesion.getHora());
+            //lblHora.setText(sesion.getHora());
+            //lblNumSala.setText(sesion.getSala());
         }
 
     }

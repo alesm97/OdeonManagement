@@ -10,6 +10,10 @@ public class Sesion {
     private Date horaPelicula;
     private int anho, dia, mes, hora, minutos, numSesion, sala;
 
+    public Sesion(){
+
+    }
+
     public Sesion(String nombrePelicula, int anho, int mes, int dia, int hora, int minutos, int numSesion, int sala) {
         this.nombrePelicula = nombrePelicula;
         horaPelicula = setHoraPelicula(anho,mes,dia,hora,minutos);

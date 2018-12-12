@@ -2,12 +2,12 @@ package com.example.alesm97.odeonmanagement.fragments;
 
 
 import android.app.Activity;
-import android.app.Application;
-import android.arch.lifecycle.ViewModelProvider;
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.ViewCompat;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,9 +23,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 
 public class EsFragment extends Fragment {
@@ -35,6 +33,7 @@ public class EsFragment extends Fragment {
     List<Sesion> sesiones = new ArrayList<>();
     RecyclerView list;
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    ESAdapter adapter;
 
 
     public EsFragment() {
@@ -48,43 +47,49 @@ public class EsFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         viewmodel = ViewModelProviders.of(getActivity()).get(MainViewModel.class);
+        View root = inflater.inflate(R.layout.fragment_es,container,false);
+        list = root.findViewById(R.id.lstEsEntrada);
+
+        sesiones = getSesiones();
+        adapter = new ESAdapter();
+
+
+        List<Sesion> sesionesN = new ArrayList<>();
+        sesionesN.add(new Sesion("Pelicula 1",2018,12,12,12,12,5,1));
+
 
         //sesiones = getSesiones();
-
-
-        View view = inflater.inflate(R.layout.fragment_es,container,false);
-        list = view.findViewById(R.id.lstEsEntrada);
+        adapter.setEmptyView(getLayoutInflater().inflate(R.layout.empty_view,container));
+        adapter.submitList(sesionesN);
+        //adapter.submitList(new ArrayList<>());
+        //adapter.addItem(new Sesion("Pelicula",2018,11,25,14,25,5,5));
+        list.setAdapter(adapter);
+        list.setLayoutManager(new GridLayoutManager(this.getContext(),1));
 
 
         //Sesion sesion = new Sesion("Pelicula",2018,12,11,16,46,1,2);
         //db.collection("sesiones").document(sesion.getCodigo()).set(sesion);
 
-        return view;
+        return root;
     }
 
 
 
     private ArrayList<Sesion> getSesiones() {
 
+        ArrayList<Sesion> resultado = new ArrayList<>();
+
         db.collection("sesiones").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
             @Override
             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                 for(DocumentSnapshot object:queryDocumentSnapshots){
-                    sesiones.add(object.toObject(Sesion.class));
+                    resultado.add(object.toObject(Sesion.class));
                 }
-
 
             }
         });
 
-        return null;
-    }
-
-    public void setList(View empty){
-        ESAdapter adapter = new ESAdapter();
-
-        adapter.setEmptyView(empty);
-        list.setAdapter(adapter);
+        return resultado;
     }
 
 }
