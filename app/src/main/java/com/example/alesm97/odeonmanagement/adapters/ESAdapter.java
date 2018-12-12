@@ -15,7 +15,7 @@ import java.util.List;
 public class ESAdapter extends BaseAdapter<Sesion,ESAdapter.ViewHolder> {
 
     public ESAdapter() {
-        //setHasStableIds(true);
+        setHasStableIds(true);
     }
 
     @NonNull
@@ -45,8 +45,8 @@ public class ESAdapter extends BaseAdapter<Sesion,ESAdapter.ViewHolder> {
 
         void bind(Sesion sesion) {
             lblNombrePelicula.setText(sesion.getNombrePelicula());
-            //lblHora.setText(sesion.getHora());
-            //lblNumSala.setText(sesion.getSala());
+            lblHora.setText(String.format("%d",sesion.getHora()));
+            lblNumSala.setText(String.format("%d",sesion.getSala()));
         }
 
     }

@@ -111,4 +111,6 @@ public abstract class BaseAdapter<M, VH extends BaseViewHolder> extends Recycler
         boolean onItemLongClick(View view, int position);
     }
 
+
+
 }

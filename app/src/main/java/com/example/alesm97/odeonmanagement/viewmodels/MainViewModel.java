@@ -3,10 +3,16 @@ package com.example.alesm97.odeonmanagement.viewmodels;
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.MutableLiveData;
+import android.arch.lifecycle.Observer;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.view.View;
+import android.widget.Toast;
 
+import com.example.alesm97.odeonmanagement.fragments.EsFragment;
+import com.example.alesm97.odeonmanagement.fragments.LimpiezaFragment;
 import com.example.alesm97.odeonmanagement.models.Sesion;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -19,17 +25,50 @@ public class MainViewModel extends AndroidViewModel {
     public MutableLiveData<String> fecha = new MutableLiveData<>();
     public MutableLiveData<List<Sesion>> sesiones = new MutableLiveData<>();
     public Watch watch = new Watch();
+    public EsFragment esFragment;
+    public LimpiezaFragment limpiezaFragment;
 
 
     public MainViewModel(@NonNull Application application) {
         super(application);
         watch.start();
         fecha.postValue(getFecha());
+        esFragment = new EsFragment();
+        limpiezaFragment = new LimpiezaFragment();
+
+    }
+
+    public void loadList(List<Sesion> sesiones){
+        esFragment.getAdapter().submitList(sesiones);
     }
 
     private String getFecha(){
         SimpleDateFormat format = new SimpleDateFormat("dd/MM/yy", Locale.getDefault());
         return format.format(new Date());
+    }
+
+    public void click(View view) {
+        /*List<Sesion> lista = new ArrayList<>();
+
+        for (int contador = 1; contador < 12 ; contador ++){
+            lista.add(new Sesion(String.format("Pelicula %d",contador),2018,12,12,12,12,5,contador));
+        }*/
+
+        Toast.makeText(view.getContext(), "aaa", Toast.LENGTH_SHORT).show();
+
+        Sesion sesion = new Sesion("Pelicula 2",2018,12,12,new Date().getMinutes(),new Date().getSeconds(),1,1);
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("sesiones").document(sesion.getCodigo()).set(sesion);
+
+        /*for(Sesion sesion : lista) {
+            db.collection("sesiones").document(sesion.getCodigo()).set(sesion).addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    Toast.makeText(MainActivity.this, "Agregado", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }*/
+
     }
 
     public class Watch extends MutableLiveData<String> {

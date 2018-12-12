@@ -3,26 +3,26 @@ package com.example.alesm97.odeonmanagement;
 import android.arch.lifecycle.ViewModelProviders;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
-import android.view.MenuItem;
+import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.alesm97.odeonmanagement.databinding.ActivityMainBinding;
-import com.example.alesm97.odeonmanagement.fragments.EsFragment;
-import com.example.alesm97.odeonmanagement.fragments.LimpiezaFragment;
 import com.example.alesm97.odeonmanagement.models.Sesion;
 import com.example.alesm97.odeonmanagement.viewmodels.MainViewModel;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
     public MainViewModel viewmodel;
     public ActivityMainBinding binding;
-    private EsFragment esFragment = new EsFragment();
-    private LimpiezaFragment limpiezaFragment = new LimpiezaFragment();
 
 
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
@@ -60,44 +60,51 @@ public class MainActivity extends AppCompatActivity {
         viewmodel.watch.observe(this, lblMainHour::setText);
         viewmodel.fecha.observe(this, lblMainFecha::setText);
 
+        Button btn = findViewById(R.id.btnLoad);
+        btn.setOnClickListener(v -> {
+            /*Toast.makeText(v.getContext(), "aaa", Toast.LENGTH_SHORT).show();
+            Sesion sesion = new Sesion("Pelicula 2",2018,12,12,new Date().getMinutes(),new Date().getSeconds(),new Date().getSeconds(),1);
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            db.collection("sesiones").document(sesion.getCodigo()).set(sesion);*/
+            recoverDataEs();
+        });
+
         changeToEsFragment();
+        recoverDataEs();
+        viewmodel.sesiones.observe(this, sesions -> {
+            viewmodel.loadList(sesions);
+        });
 
         BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
-        addDataToDB();
+        //addDataToDB();
 
         //getSupportFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.frgLayout,new EsFragment()).commit();
     }
 
-    private void addDataToDB() {
-        /*List<Sesion> lista = new ArrayList<>();
-
-        for (int contador = 1; contador < 12 ; contador ++){
-            lista.add(new Sesion(String.format("Pelicula %d",contador),2018,12,12,12,12,5,contador));
-        }*/
-
-        Sesion sesion = new Sesion("Pelicula 2",2018,12,12,15,25,6,1);
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        db.collection("sesiones").document(sesion.getCodigo()).set(sesion);
-
-        /*for(Sesion sesion : lista) {
-            db.collection("sesiones").document(sesion.getCodigo()).set(sesion).addOnSuccessListener(new OnSuccessListener<Void>() {
-                @Override
-                public void onSuccess(Void aVoid) {
-                    Toast.makeText(MainActivity.this, "Agregado", Toast.LENGTH_SHORT).show();
+    private void recoverDataEs() {
+        FirebaseFirestore fb = FirebaseFirestore.getInstance();
+        fb.collection("sesiones").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                List<Sesion> lista = new ArrayList<>();
+                for (DocumentSnapshot object : queryDocumentSnapshots){
+                    lista.add(object.toObject(Sesion.class));
                 }
-            });
-        }*/
-
+                viewmodel.sesiones.postValue(lista);
+            }
+        });
     }
 
+
+
     private void changeToEsFragment() {
-        getSupportFragmentManager().beginTransaction().replace(R.id.frgLayout,esFragment).commit();
+        getSupportFragmentManager().beginTransaction().replace(R.id.frgLayout,viewmodel.esFragment).commit();
     }
 
     private void changeToLimpiezaFragment(){
-        getSupportFragmentManager().beginTransaction().replace(R.id.frgLayout,limpiezaFragment).commit();
+        getSupportFragmentManager().beginTransaction().replace(R.id.frgLayout,viewmodel.limpiezaFragment).commit();
     }
 
 }

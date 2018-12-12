@@ -29,11 +29,23 @@ import java.util.List;
 public class EsFragment extends Fragment {
 
 
-    MainViewModel viewmodel;
-    List<Sesion> sesiones = new ArrayList<>();
     RecyclerView list;
-    private FirebaseFirestore db = FirebaseFirestore.getInstance();
-    ESAdapter adapter;
+    FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+    public RecyclerView getList() {
+        return list;
+    }
+
+    public void setList(RecyclerView list) {
+        this.list = list;
+    }
+
+    public ESAdapter getAdapter() {
+        return adapter;
+    }
+
+
+    public ESAdapter adapter;
 
 
     public EsFragment() {
@@ -46,25 +58,21 @@ public class EsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        viewmodel = ViewModelProviders.of(getActivity()).get(MainViewModel.class);
         View root = inflater.inflate(R.layout.fragment_es,container,false);
         list = root.findViewById(R.id.lstEsEntrada);
 
-        sesiones = getSesiones();
         adapter = new ESAdapter();
 
 
-        List<Sesion> sesionesN = new ArrayList<>();
-        sesionesN.add(new Sesion("Pelicula 1",2018,12,12,12,12,5,1));
+        //List<Sesion> sesionesN = new ArrayList<>();
+        //sesionesN.add(new Sesion("Pelicula 1",2018,12,12,12,12,5,1));
 
 
-        //sesiones = getSesiones();
         adapter.setEmptyView(getLayoutInflater().inflate(R.layout.empty_view,container));
-        adapter.submitList(sesionesN);
         //adapter.submitList(new ArrayList<>());
         //adapter.addItem(new Sesion("Pelicula",2018,11,25,14,25,5,5));
         list.setAdapter(adapter);
-        list.setLayoutManager(new GridLayoutManager(this.getContext(),1));
+        list.setLayoutManager(new LinearLayoutManager(this.getContext(),LinearLayoutManager.VERTICAL,false));
 
 
         //Sesion sesion = new Sesion("Pelicula",2018,12,11,16,46,1,2);
@@ -79,14 +87,11 @@ public class EsFragment extends Fragment {
 
         ArrayList<Sesion> resultado = new ArrayList<>();
 
-        db.collection("sesiones").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-            @Override
-            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                for(DocumentSnapshot object:queryDocumentSnapshots){
-                    resultado.add(object.toObject(Sesion.class));
-                }
-
+        db.collection("sesiones").get().addOnSuccessListener(queryDocumentSnapshots -> {
+            for(DocumentSnapshot object:queryDocumentSnapshots){
+                resultado.add(object.toObject(Sesion.class));
             }
+
         });
 
         return resultado;

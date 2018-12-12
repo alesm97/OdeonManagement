@@ -28,7 +28,7 @@
             <android.support.v7.widget.RecyclerView
                 android:id="@+id/lstEsEntrada"
                 android:layout_width="0dp"
-                android:layout_height="0dp"
+                android:layout_height="400dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/guideline3"
                 app:layout_constraintStart_toStartOf="parent"
