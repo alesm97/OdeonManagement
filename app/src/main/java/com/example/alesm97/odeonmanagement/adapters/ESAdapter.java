@@ -2,6 +2,7 @@ package com.example.alesm97.odeonmanagement.adapters;
 
 import android.support.annotation.NonNull;
 import android.support.v4.view.ViewCompat;
+import android.support.v7.util.DiffUtil;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,8 +15,21 @@ import java.util.List;
 
 public class ESAdapter extends BaseAdapter<Sesion,ESAdapter.ViewHolder> {
 
+    private static final DiffUtil.ItemCallback<Sesion> diffUtilCall = new DiffUtil.ItemCallback<Sesion>() {
+        @Override
+        public boolean areItemsTheSame(@NonNull Sesion sesion, @NonNull Sesion t1) {
+            return sesion.getCodigo().equals(t1.getCodigo());
+        }
+
+        @Override
+        public boolean areContentsTheSame(@NonNull Sesion sesion, @NonNull Sesion t1) {
+            return sesion.equals(t1);
+        }
+    };
+
+
     public ESAdapter() {
-        setHasStableIds(true);
+        super (diffUtilCall);
     }
 
     @NonNull
@@ -37,16 +51,18 @@ public class ESAdapter extends BaseAdapter<Sesion,ESAdapter.ViewHolder> {
         private TextView lblHora;
 
         ViewHolder(View itemView) {
-            super(itemView, getOnItemClickListener(), getOnItemLongClickListener());
+            super(itemView);
             lblNumSala = ViewCompat.requireViewById(itemView, R.id.lblEsNumSala);
             lblNombrePelicula = ViewCompat.requireViewById(itemView,R.id.lblEsTituloPelicula);
             lblHora = ViewCompat.requireViewById(itemView, R.id.lblEsHora);
         }
 
         void bind(Sesion sesion) {
-            lblNombrePelicula.setText(sesion.getNombrePelicula());
-            lblHora.setText(String.format("%d",sesion.getHora()));
-            lblNumSala.setText(String.format("%d",sesion.getSala()));
+            if (sesion != null){
+                lblNombrePelicula.setText(sesion.getNombrePelicula());
+                lblHora.setText(String.format("%d",sesion.getHora()));
+                lblNumSala.setText(String.format("%d",sesion.getSala()));
+            }
         }
 
     }
