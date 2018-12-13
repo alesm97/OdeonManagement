@@ -4,8 +4,10 @@ package com.example.alesm97.odeonmanagement.fragments;
 import android.app.Activity;
 import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -55,11 +57,12 @@ public class EsFragment extends Fragment {
 
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
         View root = inflater.inflate(R.layout.fragment_es,container,false);
         list = root.findViewById(R.id.lstEsEntrada);
+        list.addItemDecoration(new DividerItemDecoration(list.getContext(),DividerItemDecoration.VERTICAL));
 
         adapter = new ESAdapter();
 
@@ -71,8 +74,8 @@ public class EsFragment extends Fragment {
         adapter.setEmptyView(getLayoutInflater().inflate(R.layout.empty_view,container));
         //adapter.submitList(new ArrayList<>());
         //adapter.addItem(new Sesion("Pelicula",2018,11,25,14,25,5,5));
-        list.setAdapter(adapter);
         list.setLayoutManager(new LinearLayoutManager(this.getContext(),LinearLayoutManager.VERTICAL,false));
+        list.setAdapter(adapter);
 
 
         //Sesion sesion = new Sesion("Pelicula",2018,12,11,16,46,1,2);

@@ -3,7 +3,6 @@ package com.example.alesm97.odeonmanagement.viewmodels;
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
 import android.arch.lifecycle.MutableLiveData;
-import android.arch.lifecycle.Observer;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.View;
@@ -27,6 +26,7 @@ public class MainViewModel extends AndroidViewModel {
     public Watch watch = new Watch();
     public EsFragment esFragment;
     public LimpiezaFragment limpiezaFragment;
+    public MutableLiveData<Filtro> filtro = new MutableLiveData<>();
 
 
     public MainViewModel(@NonNull Application application) {
@@ -35,7 +35,7 @@ public class MainViewModel extends AndroidViewModel {
         fecha.postValue(getFecha());
         esFragment = new EsFragment();
         limpiezaFragment = new LimpiezaFragment();
-
+        filtro.setValue(Filtro.TODAS);
     }
 
     public void loadList(List<Sesion> sesiones){
@@ -48,11 +48,6 @@ public class MainViewModel extends AndroidViewModel {
     }
 
     public void click(View view) {
-        /*List<Sesion> lista = new ArrayList<>();
-
-        for (int contador = 1; contador < 12 ; contador ++){
-            lista.add(new Sesion(String.format("Pelicula %d",contador),2018,12,12,12,12,5,contador));
-        }*/
 
         Toast.makeText(view.getContext(), "aaa", Toast.LENGTH_SHORT).show();
 
@@ -60,7 +55,13 @@ public class MainViewModel extends AndroidViewModel {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("sesiones").document(sesion.getCodigo()).set(sesion);
 
-        /*for(Sesion sesion : lista) {
+        /*List<Sesion> lista = new ArrayList<>();
+
+        for (int contador = 1; contador < 12 ; contador ++){
+            lista.add(new Sesion(String.format("Pelicula %d",contador),2018,12,12,12,12,5,contador));
+        }
+
+        for(Sesion sesion : lista) {
             db.collection("sesiones").document(sesion.getCodigo()).set(sesion).addOnSuccessListener(new OnSuccessListener<Void>() {
                 @Override
                 public void onSuccess(Void aVoid) {
@@ -70,6 +71,25 @@ public class MainViewModel extends AndroidViewModel {
         }*/
 
     }
+
+    public enum Filtro {
+
+        TODAS, PARES, IMPARES
+    }
+
+
+    public void changeFilter (){
+        if (filtro.getValue() == Filtro.PARES){
+            //filtrarPares();
+        }else if (filtro.getValue() == Filtro.IMPARES){
+            //filtrarImpares();
+        }else{
+            //filtrarTodas();
+        }
+    }
+
+
+
 
     public class Watch extends MutableLiveData<String> {
 
