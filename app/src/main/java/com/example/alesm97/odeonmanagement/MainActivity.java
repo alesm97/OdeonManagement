@@ -5,10 +5,13 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.alesm97.odeonmanagement.databinding.ActivityMainBinding;
+import com.example.alesm97.odeonmanagement.models.Limpieza;
 import com.example.alesm97.odeonmanagement.models.Sesion;
 import com.example.alesm97.odeonmanagement.viewmodels.MainViewModel;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -36,10 +39,10 @@ public class MainActivity extends AppCompatActivity {
                         changeToLimpiezaFragment();
                         return true;
                     case R.id.bottom_menu_pasen:
-
+                        changeToPasenFragment();
                         return true;
                     case R.id.bottom_menu_incidencias:
-
+                        changeToIncidenciasFragment();
                         return true;
                 }
                 return false;
@@ -75,8 +78,23 @@ public class MainActivity extends AppCompatActivity {
             viewmodel.loadList(sesions);
         });
 
-        BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
-        navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+        /*findViewById(R.id.btnLoad).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(MainActivity.this, String.format("%d",viewmodel.esFragment.getAdapter().getItemCount()), Toast.LENGTH_SHORT).show();
+            }
+        });*/
+
+
+        /*findViewById(R.id.btnLoad).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(MainActivity.this, String.format("%d",viewmodel.esFragment.getAdapter().getItem(1).getCodigo()), Toast.LENGTH_SHORT).show();
+            }
+        });*/
+
+        //BottomNavigationView navigation = (BottomNavigationView) findViewById(R.id.navigation);
+        binding.navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
         //addDataToDB();
 
@@ -106,5 +124,42 @@ public class MainActivity extends AppCompatActivity {
     private void changeToLimpiezaFragment(){
         getSupportFragmentManager().beginTransaction().replace(R.id.frgLayout,viewmodel.limpiezaFragment).commit();
     }
+
+    private void changeToPasenFragment(){
+        //getSupportFragmentManager().beginTransaction().replace(R.id.frgLayout,viewmodel.pasenFragment).commit();
+    }
+
+    private void changeToIncidenciasFragment(){
+        //getSupportFragmentManager().beginTransaction().replace(R.id.frgLayout,viewmodel.incidenciasFragment).commit();
+    }
+
+    public void meterDatos(){
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        List<Sesion> sesiones = new ArrayList<>();
+        List<Limpieza> limpiezas = new ArrayList<>();
+
+        int[] anos = {2018,2018,2018,2018,2018,2018,2018,2018,2018,2018,2018,2018,2018,2018,2018};
+        int[] meses = {1,2,3,4,5,6,7,8,9,10,11,12,14,15};
+        int[] dias = {2,5,6,8,7,15,6,29,14,5,30,28,16,17};
+        int[] horas = {16,17,16,19,18,20,22,23,21,19,18,16,17,17,19};
+        int[] minutos = {0,5,10,15,30,45,35,15,0,0,45,30,25,20,25};
+        int[] sesion = {1,2,3,4,5,1,5,3,4,6,1,2,2,1,3};
+        int[] sala = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
+        String[] nombres = {"Pelicula 1","Pelicula 2","Pelicula 3","Pelicula 4","Pelicula 5","Pelicula 6","Pelicula 7","Pelicula 8","Pelicula 9","Pelicula 10","Pelicula 11","Pelicula 12","Pelicula 13","Pelicula 14","Pelicula 15"};
+
+        for (int i = 0; i < 15; i++){
+            sesiones.add(new Sesion(nombres[i],anos[i],meses[i],dias[i],horas[i],minutos[i],horas[i],minutos[i],sesion[i],sala[i]));
+        }
+
+        for(Sesion ses : sesiones){
+            db.collection("sesiones").document(ses.getCodigo()).set(ses);
+        }
+
+
+    }
+
+
+
+
 
 }

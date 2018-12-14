@@ -39,7 +39,7 @@ public class MainViewModel extends AndroidViewModel {
     }
 
     public void loadList(List<Sesion> sesiones){
-        esFragment.getAdapter().submitList(sesiones);
+        //esFragment.adapter.submitList(sesiones);
     }
 
     private String getFecha(){
@@ -47,15 +47,15 @@ public class MainViewModel extends AndroidViewModel {
         return format.format(new Date());
     }
 
-    public void click(View view) {
+    /*public void click(View view) {
 
         Toast.makeText(view.getContext(), "aaa", Toast.LENGTH_SHORT).show();
 
-        Sesion sesion = new Sesion("Pelicula 2",2018,12,12,new Date().getMinutes(),new Date().getSeconds(),1,1);
+        Sesion sesion = new Sesion("Pelicula 2",2018,12,12,new Date().getMinutes(),new Date().getSeconds(), horaS, minutosS, 1,1);
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         db.collection("sesiones").document(sesion.getCodigo()).set(sesion);
 
-        /*List<Sesion> lista = new ArrayList<>();
+        List<Sesion> lista = new ArrayList<>();
 
         for (int contador = 1; contador < 12 ; contador ++){
             lista.add(new Sesion(String.format("Pelicula %d",contador),2018,12,12,12,12,5,contador));
@@ -68,9 +68,9 @@ public class MainViewModel extends AndroidViewModel {
                     Toast.makeText(MainActivity.this, "Agregado", Toast.LENGTH_SHORT).show();
                 }
             });
-        }*/
+        }
 
-    }
+    }*/
 
     public enum Filtro {
 

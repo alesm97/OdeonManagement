@@ -1,27 +1,25 @@
 package com.example.alesm97.odeonmanagement.models;
 
-import java.util.Calendar;
-import java.util.Date;
 import java.util.Objects;
 
 public class Sesion {
 
     private String nombrePelicula, codigo;
-    private Date horaPelicula;
-    private int anho, dia, mes, hora, minutos, numSesion, sala;
+    private int anho, dia, mes, horaE, minutosE, horaS, minutosS, numSesion, sala;
 
     public Sesion(){
 
     }
 
-    public Sesion(String nombrePelicula, int anho, int mes, int dia, int hora, int minutos, int numSesion, int sala) {
+    public Sesion(String nombrePelicula, int anho, int mes, int dia, int horaE, int minutosE, int horaS, int minutosS, int numSesion, int sala) {
         this.nombrePelicula = nombrePelicula;
-        horaPelicula = setHoraPelicula(anho,mes,dia,hora,minutos);
         this.anho = anho;
         this.dia = dia;
         this.mes = mes;
-        this.hora = hora;
-        this.minutos = minutos;
+        this.horaE = horaE;
+        this.minutosE = minutosE;
+        this.horaS = horaS;
+        this.minutosS = minutosS;
         this.numSesion = numSesion;
         this.sala = sala;
         codigo = String.format("%d-%d-%d-%d-%d",dia,mes,anho,sala,numSesion);
@@ -43,21 +41,6 @@ public class Sesion {
         this.codigo = codigo;
     }
 
-    public Date getHoraPelicula() {
-        return horaPelicula;
-    }
-
-    private Date setHoraPelicula(int anho, int mes, int dia, int hora, int minutos) {
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(Calendar.YEAR,anho);
-        calendar.set(Calendar.MONTH,mes);
-        calendar.set(Calendar.DAY_OF_MONTH,dia);
-        calendar.set(Calendar.HOUR_OF_DAY,hora);
-        calendar.set(Calendar.MINUTE,minutos);
-        calendar.set(Calendar.SECOND,0);
-
-        return calendar.getTime();
-    }
 
     public int getAnho() {
         return anho;
@@ -83,20 +66,20 @@ public class Sesion {
         this.mes = mes;
     }
 
-    public int getHora() {
-        return hora;
+    public int getHoraE() {
+        return horaE;
     }
 
-    public void setHora(int hora) {
-        this.hora = hora;
+    public void setHoraE(int horaE) {
+        this.horaE = horaE;
     }
 
-    public int getMinutos() {
-        return minutos;
+    public int getMinutosE() {
+        return minutosE;
     }
 
-    public void setMinutos(int minutos) {
-        this.minutos = minutos;
+    public void setMinutosE(int minutosE) {
+        this.minutosE = minutosE;
     }
 
     public int getNumSesion() {
@@ -123,19 +106,35 @@ public class Sesion {
         return anho == sesion.anho &&
                 dia == sesion.dia &&
                 mes == sesion.mes &&
-                hora == sesion.hora &&
-                minutos == sesion.minutos &&
+                horaE == sesion.horaE &&
+                minutosE == sesion.minutosE &&
+                horaS == sesion.horaS &&
+                minutosS == sesion.minutosS &&
                 sala == sesion.sala &&
                 numSesion == sesion.numSesion &&
                 Objects.equals(nombrePelicula, sesion.nombrePelicula) &&
-                Objects.equals(codigo, sesion.codigo) &&
-                Objects.equals(horaPelicula, sesion.horaPelicula);
+                Objects.equals(codigo, sesion.codigo);
     }
 
     @Override
     public int hashCode() {
 
-        return Objects.hash(nombrePelicula, codigo, horaPelicula, anho, dia, mes, hora, minutos, numSesion);
+        return Objects.hash(nombrePelicula, codigo, anho, dia, mes, horaE, minutosE, horaS, minutosS, numSesion);
     }
 
+    //public Date getHoraPelicula() {
+    //    return horaPelicula;
+    //}
+
+    /*private Date setHoraPelicula(int anho, int mes, int dia, int hora, int minutos) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.YEAR,anho);
+        calendar.set(Calendar.MONTH,mes);
+        calendar.set(Calendar.DAY_OF_MONTH,dia);
+        calendar.set(Calendar.HOUR_OF_DAY,hora);
+        calendar.set(Calendar.MINUTE,minutos);
+        calendar.set(Calendar.SECOND,0);
+
+        return calendar.getTime();
+    }*/
 }

@@ -9,9 +9,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.alesm97.odeonmanagement.R;
+import com.example.alesm97.odeonmanagement.adapters.base.BaseAdapter;
+import com.example.alesm97.odeonmanagement.adapters.base.BaseViewHolder;
 import com.example.alesm97.odeonmanagement.models.Sesion;
-
-import java.util.List;
 
 public class ESAdapter extends BaseAdapter<Sesion,ESAdapter.ViewHolder> {
 
@@ -35,7 +35,6 @@ public class ESAdapter extends BaseAdapter<Sesion,ESAdapter.ViewHolder> {
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup viewGroup, int i) {
-
         return new ViewHolder(LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.es_list_item, viewGroup, false));
     }
 
@@ -51,7 +50,7 @@ public class ESAdapter extends BaseAdapter<Sesion,ESAdapter.ViewHolder> {
         private TextView lblHora;
 
         ViewHolder(View itemView) {
-            super(itemView);
+            super(itemView, getOnItemClickListener(), getOnItemLongClickListener());
             lblNumSala = ViewCompat.requireViewById(itemView, R.id.lblEsNumSala);
             lblNombrePelicula = ViewCompat.requireViewById(itemView,R.id.lblEsTituloPelicula);
             lblHora = ViewCompat.requireViewById(itemView, R.id.lblEsHora);
@@ -59,9 +58,9 @@ public class ESAdapter extends BaseAdapter<Sesion,ESAdapter.ViewHolder> {
 
         void bind(Sesion sesion) {
             if (sesion != null){
-                lblNombrePelicula.setText(sesion.getNombrePelicula());
-                lblHora.setText(String.format("%d",sesion.getHora()));
-                lblNumSala.setText(String.format("%d",sesion.getSala()));
+                lblNombrePelicula.setText("peli");
+                lblHora.setText("hora");
+                lblNumSala.setText("sala");
             }
         }
 

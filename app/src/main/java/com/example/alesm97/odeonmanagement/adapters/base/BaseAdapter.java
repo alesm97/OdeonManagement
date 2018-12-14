@@ -1,4 +1,4 @@
-package com.example.alesm97.odeonmanagement.adapters;
+package com.example.alesm97.odeonmanagement.adapters.base;
 
 import android.support.annotation.NonNull;
 import android.support.v7.recyclerview.extensions.ListAdapter;
@@ -13,6 +13,8 @@ public abstract class BaseAdapter<M, V extends BaseViewHolder>
 
 
     private View emptyView;
+    protected OnItemClickListener onItemClickListener;
+    protected OnItemLongClickListener onItemLongClickListener;
 
     public BaseAdapter(DiffUtil.ItemCallback<M> diffUtilItemCallback) {
         super(diffUtilItemCallback);
@@ -25,14 +27,14 @@ public abstract class BaseAdapter<M, V extends BaseViewHolder>
         super.submitList(list);
     }
 
-    /*
+
     public void setOnItemClickListener(OnItemClickListener listener) {
         this.onItemClickListener = listener;
     }
 
     public void setOnItemLongClickListener(OnItemLongClickListener listener) {
         this.onItemLongClickListener = listener;
-    }*/
+    }
 
     public void setEmptyView(@NonNull View emptyView) {
         this.emptyView = emptyView;
@@ -45,13 +47,23 @@ public abstract class BaseAdapter<M, V extends BaseViewHolder>
         }
     }
 
-    /*public OnItemClickListener getOnItemClickListener() {
+    public OnItemClickListener getOnItemClickListener() {
         return onItemClickListener;
     }
 
     public OnItemLongClickListener getOnItemLongClickListener() {
         return onItemLongClickListener;
-    }*/
+    }
+
+    public interface OnItemClickListener {
+        @SuppressWarnings("unused")
+        void onItemClick(View view, int position);
+    }
+
+    public interface OnItemLongClickListener {
+        @SuppressWarnings({"SameReturnValue", "unused"})
+        boolean onItemLongClick(View view, int position);
+    }
 
     public View getEmptyView() {
         return emptyView;
