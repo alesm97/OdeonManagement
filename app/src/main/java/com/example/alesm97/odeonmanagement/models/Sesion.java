@@ -7,7 +7,7 @@ public class Sesion {
     private String nombrePelicula, codigo;
     private int anho, dia, mes, horaE, minutosE, horaS, minutosS, numSesion, sala;
 
-    public Sesion(){
+    public Sesion() {
 
     }
 
@@ -22,7 +22,7 @@ public class Sesion {
         this.minutosS = minutosS;
         this.numSesion = numSesion;
         this.sala = sala;
-        codigo = String.format("%d-%d-%d-%d-%d",dia,mes,anho,sala,numSesion);
+        codigo = String.format("%d-%d-%d-%d-%d", dia, mes, anho, sala, numSesion);
     }
 
     public String getNombrePelicula() {
@@ -80,6 +80,22 @@ public class Sesion {
 
     public void setMinutosE(int minutosE) {
         this.minutosE = minutosE;
+    }
+
+    public int getHoraS() {
+        return horaS;
+    }
+
+    public void setHoraS(int horaS) {
+        this.horaS = horaS;
+    }
+
+    public int getMinutosS() {
+        return minutosS;
+    }
+
+    public void setMinutosS(int minutosS) {
+        this.minutosS = minutosS;
     }
 
     public int getNumSesion() {

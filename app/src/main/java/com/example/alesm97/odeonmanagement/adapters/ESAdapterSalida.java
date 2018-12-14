@@ -51,16 +51,16 @@ public class ESAdapterSalida extends BaseAdapter<Sesion,ESAdapterSalida.ViewHold
 
         ViewHolder(View itemView) {
             super(itemView, getOnItemClickListener(), getOnItemLongClickListener());
-            lblNumSala = ViewCompat.requireViewById(itemView, R.id.lblEsNumSala);
-            lblNombrePelicula = ViewCompat.requireViewById(itemView,R.id.lblEsTituloPelicula);
-            lblHora = ViewCompat.requireViewById(itemView, R.id.lblEsHora);
+            lblNumSala = ViewCompat.requireViewById(itemView, R.id.lblSalNumSala);
+            lblNombrePelicula = ViewCompat.requireViewById(itemView,R.id.lblSalTituloPelicula);
+            lblHora = ViewCompat.requireViewById(itemView, R.id.lblSalHora);
         }
 
         void bind(Sesion sesion) {
             if (sesion != null){
-                lblNombrePelicula.setText("peli");
-                lblHora.setText("hora");
-                lblNumSala.setText("sala");
+                lblNombrePelicula.setText(sesion.getNombrePelicula());
+                lblHora.setText(String.format("%02d:%02d",sesion.getHoraS(),sesion.getMinutosS()));
+                lblNumSala.setText(String.format("%d",sesion.getSala()));
             }
         }
 

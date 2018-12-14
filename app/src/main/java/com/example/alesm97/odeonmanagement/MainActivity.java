@@ -5,8 +5,6 @@ import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
-import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -16,11 +14,15 @@ import com.example.alesm97.odeonmanagement.models.Sesion;
 import com.example.alesm97.odeonmanagement.viewmodels.MainViewModel;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.annotation.Nullable;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -63,19 +65,25 @@ public class MainActivity extends AppCompatActivity {
         viewmodel.watch.observe(this, lblMainHour::setText);
         viewmodel.fecha.observe(this, lblMainFecha::setText);
 
-        Button btn = findViewById(R.id.btnLoad);
+
+        /*Button btn = findViewById(R.id.btnLoad);
         btn.setOnClickListener(v -> {
-            /*Toast.makeText(v.getContext(), "aaa", Toast.LENGTH_SHORT).show();
+            Toast.makeText(v.getContext(), "aaa", Toast.LENGTH_SHORT).show();
             Sesion sesion = new Sesion("Pelicula 2",2018,12,12,new Date().getMinutes(),new Date().getSeconds(),new Date().getSeconds(),1);
             FirebaseFirestore db = FirebaseFirestore.getInstance();
-            db.collection("sesiones").document(sesion.getCodigo()).set(sesion);*/
+            db.collection("sesiones").document(sesion.getCodigo()).set(sesion);
             recoverDataEs();
-        });
+        });*/
 
         changeToEsFragment();
+        //meterDatos();
         recoverDataEs();
+
         viewmodel.sesiones.observe(this, sesions -> {
-            viewmodel.loadList(sesions);
+
+            viewmodel.changeDataLists(sesions);
+            viewmodel.syncDataListE();
+            viewmodel.syncDataListS();
         });
 
         /*findViewById(R.id.btnLoad).setOnClickListener(new View.OnClickListener() {
@@ -103,7 +111,7 @@ public class MainActivity extends AppCompatActivity {
 
     private void recoverDataEs() {
         FirebaseFirestore fb = FirebaseFirestore.getInstance();
-        fb.collection("sesiones").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+        /*fb.collection("sesiones").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
             @Override
             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
                 List<Sesion> lista = new ArrayList<>();
@@ -112,6 +120,14 @@ public class MainActivity extends AppCompatActivity {
                 }
                 viewmodel.sesiones.postValue(lista);
             }
+        });*/
+
+        fb.collection("sesiones").addSnapshotListener((queryDocumentSnapshots, e) -> {
+            List<Sesion> lista = new ArrayList<>();
+            for (DocumentSnapshot object : queryDocumentSnapshots){
+                lista.add(object.toObject(Sesion.class));
+            }
+            viewmodel.sesiones.postValue(lista);
         });
     }
 
@@ -140,21 +156,21 @@ public class MainActivity extends AppCompatActivity {
 
         int[] anos = {2018,2018,2018,2018,2018,2018,2018,2018,2018,2018,2018,2018,2018,2018,2018};
         int[] meses = {1,2,3,4,5,6,7,8,9,10,11,12,14,15};
-        int[] dias = {2,5,6,8,7,15,6,29,14,5,30,28,16,17};
+        int[] dias = {2,5,6,8,7,15,6,29,14,5,30,28,16,17,2};
         int[] horas = {16,17,16,19,18,20,22,23,21,19,18,16,17,17,19};
         int[] minutos = {0,5,10,15,30,45,35,15,0,0,45,30,25,20,25};
         int[] sesion = {1,2,3,4,5,1,5,3,4,6,1,2,2,1,3};
         int[] sala = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
         String[] nombres = {"Pelicula 1","Pelicula 2","Pelicula 3","Pelicula 4","Pelicula 5","Pelicula 6","Pelicula 7","Pelicula 8","Pelicula 9","Pelicula 10","Pelicula 11","Pelicula 12","Pelicula 13","Pelicula 14","Pelicula 15"};
 
-        for (int i = 0; i < 15; i++){
+        for (int i = 0; i < 14; i++){
             sesiones.add(new Sesion(nombres[i],anos[i],meses[i],dias[i],horas[i],minutos[i],horas[i],minutos[i],sesion[i],sala[i]));
         }
 
         for(Sesion ses : sesiones){
             db.collection("sesiones").document(ses.getCodigo()).set(ses);
         }
-
+        Toast.makeText(this, "Listo", Toast.LENGTH_SHORT).show();
 
     }
 

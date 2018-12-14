@@ -58,9 +58,9 @@ public class ESAdapter extends BaseAdapter<Sesion,ESAdapter.ViewHolder> {
 
         void bind(Sesion sesion) {
             if (sesion != null){
-                lblNombrePelicula.setText("peli");
-                lblHora.setText("hora");
-                lblNumSala.setText("sala");
+                lblNombrePelicula.setText(sesion.getNombrePelicula());
+                lblHora.setText(String.format("%02d:%02d",sesion.getHoraE(),sesion.getMinutosE()));
+                lblNumSala.setText(String.format("%d",sesion.getSala()));
             }
         }
 

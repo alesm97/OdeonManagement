@@ -47,8 +47,8 @@ public class EsFragment extends Fragment {
         adapter = new ESAdapter();
         adapterSalida = new ESAdapterSalida();
 
-        adapter.setEmptyView(getLayoutInflater().inflate(R.layout.empty_view_e,container));
-        adapterSalida.setEmptyView(getLayoutInflater().inflate(R.layout.empty_view_s,container));
+        //adapter.setEmptyView(getLayoutInflater().inflate(R.layout.empty_view_e,container));
+        //adapterSalida.setEmptyView(getLayoutInflater().inflate(R.layout.empty_view_s,container));
 
         list.setLayoutManager(new LinearLayoutManager(this.getContext(),LinearLayoutManager.VERTICAL,false));
         listS.setLayoutManager(new LinearLayoutManager(this.getContext(),LinearLayoutManager.VERTICAL,false));
