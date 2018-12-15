@@ -7,10 +7,10 @@ import android.arch.lifecycle.MutableLiveData;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
 
 import com.example.alesm97.odeonmanagement.fragments.EsFragment;
 import com.example.alesm97.odeonmanagement.fragments.LimpiezaFragment;
+import com.example.alesm97.odeonmanagement.models.Limpieza;
 import com.example.alesm97.odeonmanagement.models.Sesion;
 
 import java.text.SimpleDateFormat;
@@ -27,9 +27,11 @@ public class MainViewModel extends AndroidViewModel {
 
     public MutableLiveData<String> fecha = new MutableLiveData<>();
     public MutableLiveData<List<Sesion>> sesiones = new MutableLiveData<>();
+    public MutableLiveData<List<Limpieza>> limpiezas = new MutableLiveData<>();
 
     private List<Sesion> entradas = new ArrayList<>();
     private List<Sesion> salidas = new ArrayList<>();
+    private List<Sesion> limpiezasList = new ArrayList<>();
 
     public Watch watch = new Watch();
 
@@ -82,15 +84,70 @@ public class MainViewModel extends AndroidViewModel {
         entradas.addAll(sesiones);
         salidas.clear();
         salidas.addAll(sesiones);
+
         Collections.sort(entradas, new Comparator<Sesion>() {
+
             @Override
             public int compare(Sesion o1, Sesion o2) {
-                return 0;
+                int c = Integer.compare(o1.getHoraE(), o2.getHoraE());
+
+                if (c == 0){
+                    c = Integer.compare(o1.getMinutosE(), o2.getMinutosE());
+                }
+
+                return c;
             }
         });
+
+        Collections.sort(salidas, new Comparator<Sesion>() {
+
+            @Override
+            public int compare(Sesion o1, Sesion o2) {
+                int c = Integer.compare(o1.getHoraS(), o2.getHoraS());
+
+                if (c == 0){
+                    c = Integer.compare(o1.getMinutosS(), o2.getMinutosS());
+                }
+
+                return c;
+            }
+        });
+
         esFragment.adapter.submitList(entradas);
         esFragment.adapterSalida.submitList(salidas);
     }
+
+    public void updateLimpiezas(List<Limpieza> limpiezas){
+        limpiezaFragment.adapter.submitList(limpiezas);
+    }
+
+
+    public void launchSyncLists(){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                syncDataListE();
+                try {
+                    Thread.sleep(60000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                syncDataListS();
+                try {
+                    Thread.sleep(60000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+    }
+
 
     @TargetApi(Build.VERSION_CODES.O)
     public void syncDataListE(){
@@ -101,7 +158,7 @@ public class MainViewModel extends AndroidViewModel {
             LocalTime time1 = LocalTime.now();
             LocalTime time2 = LocalTime.of(sesion.getHoraE(),sesion.getMinutosE());
 
-            if(time1.isAfter(time2.plusMinutes(15))){
+            if(time1.isAfter(time2.plusMinutes(2))){
                 aEliminar.add(sesion);
                 contador++;
             }
@@ -111,30 +168,6 @@ public class MainViewModel extends AndroidViewModel {
             entradas.removeAll(aEliminar);
             esFragment.adapter.submitList(entradas);
         }
-
-        /*
-        new Thread(() -> {
-            int contador = 0;
-            for (Sesion sesion : entradas){
-                LocalTime time1 = LocalTime.now();
-                LocalTime time2 = LocalTime.of(sesion.getHoraE(),sesion.getMinutosE());
-
-                if(time1.isAfter(time2.plusMinutes(15))){
-                    entradas.remove(sesion);
-                    contador++;
-                }
-            }
-
-            if(contador>0){
-                esFragment.adapter.submitList(entradas);
-            }
-
-            try {
-                Thread.sleep(60000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }).start();*/
     }
 
     @TargetApi(Build.VERSION_CODES.O)
@@ -146,7 +179,7 @@ public class MainViewModel extends AndroidViewModel {
             LocalTime time1 = LocalTime.now();
             LocalTime time2 = LocalTime.of(sesion.getHoraE(),sesion.getMinutosE());
 
-            if(time1.isAfter(time2.plusMinutes(15))){
+            if(time1.isAfter(time2.plusMinutes(2))){
                 aEliminar.add(sesion);
                 contador++;
             }
@@ -156,24 +189,6 @@ public class MainViewModel extends AndroidViewModel {
             salidas.removeAll(aEliminar);
             esFragment.adapterSalida.submitList(salidas);
         }
-
-        /*
-        new Thread(() -> {
-            int contador = 0;
-            for (Sesion sesion : salidas){
-                LocalTime time1 = LocalTime.now();
-                LocalTime time2 = LocalTime.of(sesion.getHoraE(),sesion.getMinutosE());
-
-                if(time1.isAfter(time2.plusMinutes(15))){
-                    entradas.remove(sesion);
-                    contador++;
-                }
-            }
-
-            if(contador>0){
-                esFragment.adapterSalida.submitList(entradas);
-            }
-        }).start();*/
     }
 
     public enum Filtro {

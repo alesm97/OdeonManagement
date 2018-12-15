@@ -1,6 +1,7 @@
 package com.example.alesm97.odeonmanagement.adapters;
 
 import android.support.annotation.NonNull;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -51,16 +52,16 @@ public class LimpiezaAdapter extends BaseAdapter<Limpieza, LimpiezaAdapter.ViewH
 
         ViewHolder(View itemView) {
             super(itemView, getOnItemClickListener(), getOnItemLongClickListener());
-            //lblNumSala = ViewCompat.requireViewById(itemView, R.id.lblEsNumSala);
-            //lblNombrePelicula = ViewCompat.requireViewById(itemView,R.id.lblEsTituloPelicula);
-            //lblHora = ViewCompat.requireViewById(itemView, R.id.lblEsHora);
+            lblNumSala = ViewCompat.requireViewById(itemView, R.id.lblLimSala);
+            lblNombrePelicula = ViewCompat.requireViewById(itemView,R.id.lblLimNombrePelicula);
+            lblHora = ViewCompat.requireViewById(itemView, R.id.lblLimHora);
         }
 
         void bind(Limpieza limpieza) {
             if (limpieza != null){
-                //lblNombrePelicula.setText(sesion.getNombrePelicula());
-                //lblHora.setText(String.format("%d",sesion.getHoraE()));
-                //lblNumSala.setText(String.format("%d",sesion.getSala()));
+                lblNombrePelicula.setText(limpieza.getNombrePelicula());
+                lblHora.setText(String.format("%02d:%02d",limpieza.getHora(),limpieza.getMinutos()));
+                lblNumSala.setText(String.format("%d",limpieza.getSala()));
             }
         }
 

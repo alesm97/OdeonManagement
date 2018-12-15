@@ -5,9 +5,24 @@ import java.util.Date;
 public class Limpieza {
 
     private String nombrePelicula, codigo;
-    private Date horaPelicula;
     private int anho, dia, mes, hora, minutos, numSesion, sala;
     private boolean limpia;
+
+    public Limpieza() {
+    }
+
+    public Limpieza(String nombrePelicula, int anho, int dia, int mes, int hora, int minutos, int numSesion, int sala, boolean limpia) {
+        this.nombrePelicula = nombrePelicula;
+        this.anho = anho;
+        this.dia = dia;
+        this.mes = mes;
+        this.hora = hora;
+        this.minutos = minutos;
+        this.numSesion = numSesion;
+        this.sala = sala;
+        this.limpia = limpia;
+        codigo = String.format("%d-%d-%d-%d-%d", dia, mes, anho, sala, numSesion);
+    }
 
     public String getNombrePelicula() {
         return nombrePelicula;
@@ -23,14 +38,6 @@ public class Limpieza {
 
     public void setCodigo(String codigo) {
         this.codigo = codigo;
-    }
-
-    public Date getHoraPelicula() {
-        return horaPelicula;
-    }
-
-    public void setHoraPelicula(Date horaPelicula) {
-        this.horaPelicula = horaPelicula;
     }
 
     public int getAnho() {
