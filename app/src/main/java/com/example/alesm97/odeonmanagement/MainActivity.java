@@ -1,29 +1,36 @@
 package com.example.alesm97.odeonmanagement;
 
+import android.annotation.TargetApi;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.databinding.DataBindingUtil;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.support.design.widget.BottomNavigationView;
+import android.support.design.widget.FloatingActionButton;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.alesm97.odeonmanagement.adapters.base.BaseAdapter;
 import com.example.alesm97.odeonmanagement.databinding.ActivityMainBinding;
 import com.example.alesm97.odeonmanagement.models.Limpieza;
+import com.example.alesm97.odeonmanagement.models.Pasen;
 import com.example.alesm97.odeonmanagement.models.Sesion;
 import com.example.alesm97.odeonmanagement.viewmodels.MainViewModel;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.annotation.Nullable;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -37,9 +44,6 @@ public class MainActivity extends AppCompatActivity {
                 switch (item.getItemId()) {
                     case R.id.bottom_menu_es:
                         changeToEsFragment();
-                        return true;
-                    case R.id.bottom_menu_limpieza:
-                        changeToLimpiezaFragment();
                         return true;
                     case R.id.bottom_menu_pasen:
                         changeToPasenFragment();
@@ -66,74 +70,174 @@ public class MainActivity extends AppCompatActivity {
 
         TextView lblMainHour = findViewById(R.id.lblMainHour);
         TextView lblMainFecha = findViewById(R.id.lblMainFecha);
+        FloatingActionButton btnLoad = findViewById(R.id.btnReload);
+
+        /*btnLoad.setOnClickListener(v -> {
+            if(viewmodel.pasenFragment.isVisible()){
+                viewmodel.setPasenData();
+            }else if(viewmodel.esFragment.isVisible()){
+                viewmodel.setEsData();
+            }
+        });*/
 
         viewmodel.watch.observe(this, lblMainHour::setText);
         viewmodel.fecha.observe(this, lblMainFecha::setText);
 
 
-        //meterDatos();
+        //meterDatos2();
         recoverDataEs();
-        recoverDataLim();
+        recoverDataPasen();
 
-        viewmodel.sesiones.observe(this, sesions -> {
+        addFragments();
+
+        /*viewmodel.sesiones.observe(this, sesions -> {
 
             viewmodel.changeDataLists(sesions);
-            viewmodel.launchSyncLists();
-        });
 
-        viewmodel.limpiezas.observe(this, new Observer<List<Limpieza>>() {
-            @Override
-            public void onChanged(@android.support.annotation.Nullable List<Limpieza> limpiezas) {
-                if (viewmodel.limpiezaFragment.adapter != null){
-                    viewmodel.limpiezaFragment.adapter.submitList(limpiezas);
-                }
-            }
+        });*/
+
+
+        viewmodel.pasen.observe(this, sesions -> {
+            viewmodel.setPasenData();
         });
 
         changeToEsFragment();
+
+
+        viewmodel.entradas.observe(this, new Observer<List<Sesion>>() {
+            @Override
+            public void onChanged(@Nullable List<Sesion> sesions) {
+                viewmodel.esFragment.adapter.submitList(sesions);
+                //viewmodel.syncDataListE();
+            }
+        });
+
+        viewmodel.salidas.observe(this, new Observer<List<Sesion>>() {
+            @Override
+            public void onChanged(@Nullable List<Sesion> sesions) {
+                viewmodel.esFragment.adapterSalida.submitList(sesions);
+                //viewmodel.syncDataListS();
+            }
+        });
+
+        //viewmodel.threadLoadData();
+
+        syncEsData();
+
+        setOnClickPasen();
 
         BottomNavigationView nav = findViewById(R.id.navigation);
         nav.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
     }
 
+    private void setOnClickPasen() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+                while(viewmodel.pasenFragment.adapter == null){
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                viewmodel.pasenFragment.adapter.setOnItemClickListener(new BaseAdapter.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(View view, int position) {
+                        Pasen pase = viewmodel.pasen.getValue().get(position);
+                        pase.setPasen(!pase.isPasen());
+                        FirebaseFirestore db = FirebaseFirestore.getInstance();
+                        db.collection("pasen").document(String.format("%d",pase.getSala())).set(viewmodel.pasen.getValue().get(position));
+                    }
+                });
+
+            }
+        }).start();
+
+    }
+
+
+    private void addFragments() {
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.add(R.id.frgLayout,viewmodel.esFragment).hide(viewmodel.esFragment);
+        transaction.commit();
+
+        transaction = getSupportFragmentManager().beginTransaction();
+        transaction.add(R.id.frgLayout,viewmodel.pasenFragment).hide(viewmodel.pasenFragment);
+        transaction.commit();
+    }
+
+    private void recoverDataPasen() {
+        FirebaseFirestore fb = FirebaseFirestore.getInstance();
+
+        fb.collection("pasen").addSnapshotListener((queryDocumentSnapshots, e) -> {
+            List<Pasen> lista = new ArrayList<>();
+            for (DocumentSnapshot object : queryDocumentSnapshots){
+                lista.add(object.toObject(Pasen.class));
+            }
+            viewmodel.pasen.postValue(lista);
+        });
+    }
+
     private void recoverDataEs() {
         FirebaseFirestore fb = FirebaseFirestore.getInstance();
 
-        fb.collection("sesiones").addSnapshotListener((queryDocumentSnapshots, e) -> {
+        fb.collection("entradas").whereEqualTo("anho",2018).whereEqualTo("mes",1).whereEqualTo("dia",15).addSnapshotListener((queryDocumentSnapshots, e) -> {
             List<Sesion> lista = new ArrayList<>();
             for (DocumentSnapshot object : queryDocumentSnapshots){
                 lista.add(object.toObject(Sesion.class));
             }
-            viewmodel.sesiones.postValue(lista);
+            viewmodel.entradas.setValue(lista);
         });
-    }
 
-    private void recoverDataLim() {
-        FirebaseFirestore fb = FirebaseFirestore.getInstance();
-
-        fb.collection("limpiezas").addSnapshotListener((queryDocumentSnapshots, e) -> {
-            List<Limpieza> lista = new ArrayList<>();
+        fb.collection("salidas").whereEqualTo("anho",2018).whereEqualTo("mes",1).whereEqualTo("dia",15).addSnapshotListener((queryDocumentSnapshots, e) -> {
+            List<Sesion> lista = new ArrayList<>();
             for (DocumentSnapshot object : queryDocumentSnapshots){
-                lista.add(object.toObject(Limpieza.class));
+                lista.add(object.toObject(Sesion.class));
             }
-            viewmodel.limpiezas.postValue(lista);
+            viewmodel.salidas.setValue(lista);
         });
     }
-
-
 
     private void changeToEsFragment() {
-        getSupportFragmentManager().beginTransaction().replace(R.id.frgLayout,viewmodel.esFragment).commit();
-        viewmodel.changeDataLists(viewmodel.sesiones.getValue());
-    }
-
-    private void changeToLimpiezaFragment(){
-        getSupportFragmentManager().beginTransaction().replace(R.id.frgLayout,viewmodel.limpiezaFragment).commit();
+        FragmentTransaction trans = getSupportFragmentManager().beginTransaction();
+        if(!viewmodel.esFragment.isVisible()){
+            if(viewmodel.pasenFragment.isVisible()){
+                trans.hide(viewmodel.pasenFragment);
+                trans.show(viewmodel.esFragment);
+            }else{
+                // TODO agregar fragmento incidencias
+                trans.show(viewmodel.esFragment);
+            }
+        }
+        trans.commit();
+        //viewmodel.setEsData();
     }
 
     private void changeToPasenFragment(){
-        //getSupportFragmentManager().beginTransaction().replace(R.id.frgLayout,viewmodel.pasenFragment).commit();
+        FragmentTransaction trans = getSupportFragmentManager().beginTransaction();
+        if(!viewmodel.pasenFragment.isVisible()){
+            if(viewmodel.esFragment.isVisible()){
+                trans.hide(viewmodel.esFragment);
+                trans.show(viewmodel.pasenFragment);
+            }else{
+                trans.show(viewmodel.pasenFragment);
+            }
+        }
+        trans.commit();
+        //viewmodel.setPasenData();
+    }
+
+    private void observeEsLists() {
+
+    }
+
+    private void changeToLimpiezaFragment(){
+        //getSupportFragmentManager().beginTransaction().replace(R.id.frgLayout,viewmodel.limpiezaFragment).commit();
+        //observeLimList();
     }
 
     private void changeToIncidenciasFragment(){
@@ -178,8 +282,118 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    public void meterDatos2(){
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("sesiones").get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+            @Override
+            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                List<Sesion> lista = new ArrayList<>();
+                for (DocumentSnapshot object : queryDocumentSnapshots){
+                    lista.add(object.toObject(Sesion.class));
+                }
+                for (Sesion s : lista){
+                    db.collection("entradas").document(s.getCodigo()).set(s);
+                    db.collection("salidas").document(s.getCodigo()).set(s);
+                }
+
+            }
+        });
+    }
+
+    @TargetApi(Build.VERSION_CODES.O)
+    public void syncEsData() {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (viewmodel.esFragment.adapter == null && viewmodel.esFragment.adapterSalida == null) {
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+                FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+                while (!Thread.currentThread().isInterrupted()) {
+
+                    List<Sesion> objectos = viewmodel.entradas.getValue();
+
+                    if (objectos != null) {
+                        List<Sesion> aEliminar = new ArrayList<>();
+                        for (Sesion sesion : objectos) {
+                            LocalTime time1 = LocalTime.now();
+                            LocalTime time2 = LocalTime.of(sesion.getHoraE(), sesion.getMinutosE());
+
+                            if (time1.isAfter(time2.plusMinutes(2))) {
+                                aEliminar.add(sesion);
+                            }
+                        }
+
+                        for (Sesion s : aEliminar) {
+                            db.collection("entradas").document(s.getCodigo()).delete();
+                        }
 
 
+                        objectos = viewmodel.salidas.getValue();
+                        if (objectos != null) {
+                            aEliminar.clear();
+                            for (Sesion sesion : objectos) {
+                                LocalTime time1 = LocalTime.now();
+                                LocalTime time2 = LocalTime.of(sesion.getHoraS(), sesion.getMinutosS());
+
+                                if (time1.isAfter(time2.plusMinutes(2))) {
+                                    aEliminar.add(sesion);
+                                }
+                            }
+
+                            for (Sesion s : aEliminar) {
+                                db.collection("salidas").document(s.getCodigo()).delete();
+                            }
+                        }
+
+
+                        //viewmodel.updateEs();
+                        try {
+                            Thread.sleep(30000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }
+        }).start();
+    }
+
+
+
+
+    public void launchSyncLists() {
+        Thread syncE = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                viewmodel.syncDataListE();
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        syncE.start();
+
+        Thread syncS = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                viewmodel.syncDataListS();
+                try {
+                    Thread.sleep(5000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        syncS.start();
+    }
 
 
 }

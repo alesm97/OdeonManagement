@@ -12,7 +12,9 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
         android:text="@string/sala"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
@@ -20,28 +22,21 @@
         android:id="@+id/lblPasenSala"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
         android:textAppearance="@style/TextAppearance.AppCompat.Display2"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/lblPasenSalaTitle"
-        tools:text="10" />
-
-    <TextView
-        android:id="@+id/lblPasenPelicula"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        app:layout_constraintStart_toEndOf="@+id/lblPasenSala"
+        app:layout_constraintStart_toEndOf="@+id/lblPasenSalaTitle"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="Pelicula" />
+        tools:text="10" />
 
     <TextView
         android:id="@+id/lblPasenPasen"
         android:layout_width="100dp"
-        android:layout_marginEnd="8dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="32dp"
         android:layout_marginBottom="8dp"
         android:paddingTop="10dp"
         android:paddingBottom="10dp"
@@ -49,6 +44,6 @@
         android:textAppearance="@style/TextAppearance.AppCompat.Body2"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        tools:text="ESPEREN"
-        android:layout_height="wrap_content" />
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="ESPEREN" />
 </android.support.constraint.ConstraintLayout>

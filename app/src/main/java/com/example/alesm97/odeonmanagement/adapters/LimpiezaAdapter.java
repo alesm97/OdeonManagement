@@ -13,6 +13,7 @@ import com.example.alesm97.odeonmanagement.R;
 import com.example.alesm97.odeonmanagement.adapters.base.BaseAdapter;
 import com.example.alesm97.odeonmanagement.adapters.base.BaseViewHolder;
 import com.example.alesm97.odeonmanagement.models.Limpieza;
+import com.example.alesm97.odeonmanagement.viewmodels.MainViewModel;
 
 public class LimpiezaAdapter extends BaseAdapter<Limpieza, LimpiezaAdapter.ViewHolder> {
 
@@ -27,7 +28,6 @@ public class LimpiezaAdapter extends BaseAdapter<Limpieza, LimpiezaAdapter.ViewH
             return limpieza.equals(t1);
         }
     };
-
 
     public LimpiezaAdapter() {
         super(diffUtilCall);

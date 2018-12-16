@@ -27,7 +27,6 @@ public class ESAdapterSalida extends BaseAdapter<Sesion,ESAdapterSalida.ViewHold
         }
     };
 
-
     public ESAdapterSalida() {
         super (diffUtilCall);
     }

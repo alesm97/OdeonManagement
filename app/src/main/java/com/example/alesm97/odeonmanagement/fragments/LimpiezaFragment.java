@@ -1,6 +1,7 @@
 package com.example.alesm97.odeonmanagement.fragments;
 
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -12,8 +13,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.alesm97.odeonmanagement.MainActivity;
 import com.example.alesm97.odeonmanagement.R;
 import com.example.alesm97.odeonmanagement.adapters.LimpiezaAdapter;
+import com.example.alesm97.odeonmanagement.viewmodels.MainViewModel;
 
 
 public class LimpiezaFragment extends Fragment {
@@ -33,17 +36,11 @@ public class LimpiezaFragment extends Fragment {
         View root = inflater.inflate(R.layout.fragment_limpieza,container);
         list = root.findViewById(R.id.lstLimpieza);
         list.addItemDecoration(new DividerItemDecoration(list.getContext(),DividerItemDecoration.VERTICAL));
-
+        adapter = new LimpiezaAdapter();
         list.setLayoutManager(new LinearLayoutManager(this.getContext(),LinearLayoutManager.VERTICAL,false));
         list.setAdapter(adapter);
 
 
         return inflater.inflate(R.layout.fragment_limpieza, container, false);
-    }
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        adapter = new LimpiezaAdapter();
     }
 }

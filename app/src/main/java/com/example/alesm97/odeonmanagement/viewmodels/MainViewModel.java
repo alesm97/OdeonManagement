@@ -1,5 +1,6 @@
 package com.example.alesm97.odeonmanagement.viewmodels;
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
@@ -7,11 +8,15 @@ import android.arch.lifecycle.MutableLiveData;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
+import android.view.View;
 
+import com.example.alesm97.odeonmanagement.adapters.base.BaseAdapter;
 import com.example.alesm97.odeonmanagement.fragments.EsFragment;
-import com.example.alesm97.odeonmanagement.fragments.LimpiezaFragment;
-import com.example.alesm97.odeonmanagement.models.Limpieza;
+import com.example.alesm97.odeonmanagement.fragments.PasenFragment;
+import com.example.alesm97.odeonmanagement.models.Pasen;
 import com.example.alesm97.odeonmanagement.models.Sesion;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalTime;
@@ -27,16 +32,18 @@ public class MainViewModel extends AndroidViewModel {
 
     public MutableLiveData<String> fecha = new MutableLiveData<>();
     public MutableLiveData<List<Sesion>> sesiones = new MutableLiveData<>();
-    public MutableLiveData<List<Limpieza>> limpiezas = new MutableLiveData<>();
 
-    private List<Sesion> entradas = new ArrayList<>();
-    private List<Sesion> salidas = new ArrayList<>();
-    private List<Sesion> limpiezasList = new ArrayList<>();
+    public MutableLiveData<List<Pasen>> pasen = new MutableLiveData<>();
+
+    public MutableLiveData<List<Sesion>> entradas = new MutableLiveData<>();
+    public MutableLiveData<List<Sesion>> salidas = new MutableLiveData<>();
+
+    private List<Pasen> listaPasen = new ArrayList<>();
 
     public Watch watch = new Watch();
 
     public EsFragment esFragment;
-    public LimpiezaFragment limpiezaFragment;
+    public PasenFragment pasenFragment;
 
     public MutableLiveData<Filtro> filtro = new MutableLiveData<>();
 
@@ -47,8 +54,7 @@ public class MainViewModel extends AndroidViewModel {
         fecha.postValue(getFecha());
 
         esFragment = new EsFragment();
-        limpiezaFragment = new LimpiezaFragment();
-
+        pasenFragment = new PasenFragment();
 
 
         filtro.setValue(Filtro.TODAS);
@@ -56,79 +62,71 @@ public class MainViewModel extends AndroidViewModel {
 
     }
 
-    public void loadList(List<Sesion> sesiones){
-        esFragment.adapter.submitList(sesiones);
-    }
 
-    private String getFecha(){
+    private String getFecha() {
         SimpleDateFormat format = new SimpleDateFormat("dd/MM/yy", Locale.getDefault());
         return format.format(new Date());
     }
 
 
-
-
-    public void changeFilter (){
-        if (filtro.getValue() == Filtro.PARES){
+    public void changeFilter() {
+        if (filtro.getValue() == Filtro.PARES) {
             //filtrarPares();
-        }else if (filtro.getValue() == Filtro.IMPARES){
+        } else if (filtro.getValue() == Filtro.IMPARES) {
             //filtrarImpares();
-        }else{
+        } else {
             //filtrarTodas();
         }
     }
 
 
-    public void changeDataLists(List<Sesion> sesiones){
-        entradas.clear();
-        entradas.addAll(sesiones);
-        salidas.clear();
-        salidas.addAll(sesiones);
+    public void changeDataLists(List<Sesion> sesiones) {
+        if (sesiones != null) {
+            List<Sesion> list1 = new ArrayList<>(sesiones);
+            List<Sesion> list2 = new ArrayList<>(sesiones);
 
-        Collections.sort(entradas, new Comparator<Sesion>() {
+            Collections.sort(list1, new Comparator<Sesion>() {
 
-            @Override
-            public int compare(Sesion o1, Sesion o2) {
-                int c = Integer.compare(o1.getHoraE(), o2.getHoraE());
+                @Override
+                public int compare(Sesion o1, Sesion o2) {
+                    int c = Integer.compare(o1.getHoraE(), o2.getHoraE());
 
-                if (c == 0){
-                    c = Integer.compare(o1.getMinutosE(), o2.getMinutosE());
+                    if (c == 0) {
+                        c = Integer.compare(o1.getMinutosE(), o2.getMinutosE());
+                    }
+
+                    return c;
                 }
+            });
 
-                return c;
-            }
-        });
+            Collections.sort(list2, new Comparator<Sesion>() {
 
-        Collections.sort(salidas, new Comparator<Sesion>() {
+                @Override
+                public int compare(Sesion o1, Sesion o2) {
+                    int c = Integer.compare(o1.getHoraS(), o2.getHoraS());
 
-            @Override
-            public int compare(Sesion o1, Sesion o2) {
-                int c = Integer.compare(o1.getHoraS(), o2.getHoraS());
+                    if (c == 0) {
+                        c = Integer.compare(o1.getMinutosS(), o2.getMinutosS());
+                    }
 
-                if (c == 0){
-                    c = Integer.compare(o1.getMinutosS(), o2.getMinutosS());
+                    return c;
                 }
+            });
 
-                return c;
-            }
-        });
+            entradas.setValue(list1);
+            salidas.setValue(list2);
+        }
 
-        esFragment.adapter.submitList(entradas);
-        esFragment.adapterSalida.submitList(salidas);
-    }
-
-    public void updateLimpiezas(List<Limpieza> limpiezas){
-        limpiezaFragment.adapter.submitList(limpiezas);
     }
 
 
-    public void launchSyncLists(){
+    /*public void launchSyncLists() {
         new Thread(new Runnable() {
             @Override
             public void run() {
                 syncDataListE();
                 try {
-                    Thread.sleep(60000);
+                    Thread.sleep(5000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -140,56 +138,134 @@ public class MainViewModel extends AndroidViewModel {
             public void run() {
                 syncDataListS();
                 try {
-                    Thread.sleep(60000);
+                    Thread.sleep(5000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
         }).start();
-    }
+    }*/
 
 
     @TargetApi(Build.VERSION_CODES.O)
-    public void syncDataListE(){
+    public void syncDataListE() {
 
         int contador = 0;
-        List<Sesion> aEliminar = new ArrayList<>();
-        for (Sesion sesion : entradas){
-            LocalTime time1 = LocalTime.now();
-            LocalTime time2 = LocalTime.of(sesion.getHoraE(),sesion.getMinutosE());
+        List<Sesion> objectos = entradas.getValue();
+        if (objectos != null){
+            List<Sesion> aEliminar = new ArrayList<>();
+            for (Sesion sesion : objectos) {
+                LocalTime time1 = LocalTime.now();
+                LocalTime time2 = LocalTime.of(sesion.getHoraE(), sesion.getMinutosE());
 
-            if(time1.isAfter(time2.plusMinutes(2))){
-                aEliminar.add(sesion);
-                contador++;
+                if (time1.isAfter(time2.plusMinutes(2))) {
+                    aEliminar.add(sesion);
+                    contador++;
+                }
             }
+
+            if (contador > 0) {
+                objectos.removeAll(aEliminar);
+            }
+
+            //esFragment.adapter.submitList(objectos);
         }
 
-        if(contador>0){
-            entradas.removeAll(aEliminar);
-            esFragment.adapter.submitList(entradas);
-        }
     }
 
     @TargetApi(Build.VERSION_CODES.O)
-    public void syncDataListS(){
+    public void updateEs() {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        int contador = 0;
-        List<Sesion> aEliminar = new ArrayList<>();
-        for (Sesion sesion : salidas){
-            LocalTime time1 = LocalTime.now();
-            LocalTime time2 = LocalTime.of(sesion.getHoraE(),sesion.getMinutosE());
+        List<Sesion> objectos = entradas.getValue();
+        if (objectos != null) {
+            List<Sesion> aEliminar = new ArrayList<>();
+            for (Sesion sesion : objectos) {
+                LocalTime time1 = LocalTime.now();
+                LocalTime time2 = LocalTime.of(sesion.getHoraE(), sesion.getMinutosE());
 
-            if(time1.isAfter(time2.plusMinutes(2))){
-                aEliminar.add(sesion);
-                contador++;
+                if (time1.isAfter(time2.plusMinutes(2))) {
+                    aEliminar.add(sesion);
+                }
+            }
+
+            for(Sesion s :objectos){
+                db.collection("entradas").document(s.getCodigo()).delete();
+            }
+
+
+            objectos = salidas.getValue();
+            if (objectos != null) {
+                aEliminar.clear();
+                for (Sesion sesion : objectos) {
+                    LocalTime time1 = LocalTime.now();
+                    LocalTime time2 = LocalTime.of(sesion.getHoraE(), sesion.getMinutosE());
+
+                    if (time1.isAfter(time2.plusMinutes(2))) {
+                        aEliminar.add(sesion);
+                    }
+                }
+
+                for(Sesion s :objectos){
+                    db.collection("salidas").document(s.getCodigo()).delete();
+                }
             }
         }
 
-        if(contador>0){
-            salidas.removeAll(aEliminar);
-            esFragment.adapterSalida.submitList(salidas);
+    }
+
+    @TargetApi(Build.VERSION_CODES.O)
+    public void syncDataListS() {
+
+        int contador = 0;
+        List<Sesion> aEliminar = new ArrayList<>();
+        List<Sesion> objetos = salidas.getValue();
+        if (objetos != null){
+            for (Sesion sesion : objetos) {
+                LocalTime time1 = LocalTime.now();
+                LocalTime time2 = LocalTime.of(sesion.getHoraS(), sesion.getMinutosS());
+
+                if (time1.isAfter(time2.plusMinutes(2))) {
+                    aEliminar.add(sesion);
+                    contador++;
+                }
+            }
+
+            if (contador > 0) {
+                objetos.removeAll(aEliminar);
+            }
+
+            esFragment.adapterSalida.submitList(objetos);
         }
     }
+
+    public void setEsData() {
+        if (esFragment.adapter != null) {
+            syncDataListE();
+            syncDataListS();
+            esFragment.adapter.submitList(entradas.getValue());
+            esFragment.adapterSalida.submitList(salidas.getValue());
+        }
+
+    }
+
+    public void setPasenData() {
+        if (pasenFragment.adapter != null) {
+            pasenFragment.adapter.submitList(pasen.getValue());
+        }
+    }
+
+    public void threadLoadData() {
+
+        if (esFragment.adapter != null) {
+            esFragment.adapter.submitList(entradas.getValue());
+        }
+        if (esFragment.adapterSalida != null) {
+            esFragment.adapterSalida.submitList(salidas.getValue());
+        }
+
+    }
+
 
     public enum Filtro {
 
@@ -202,10 +278,10 @@ public class MainViewModel extends AndroidViewModel {
         private Thread thread;
         private int numero = 0;
 
-        public void start(){
-            if (thread == null || !thread.isAlive()){
+        public void start() {
+            if (thread == null || !thread.isAlive()) {
                 thread = new Thread(() -> {
-                    while(!Thread.currentThread().isInterrupted()){
+                    while (!Thread.currentThread().isInterrupted()) {
                         postValue(simpleDateFormat.format(new Date()));
                         try {
                             Thread.sleep(1000);
@@ -231,7 +307,7 @@ public class MainViewModel extends AndroidViewModel {
         @Nullable
         @Override
         public String getValue() {
-            return String.format("%d",numero);
+            return String.format("%d", numero);
         }
     }
 

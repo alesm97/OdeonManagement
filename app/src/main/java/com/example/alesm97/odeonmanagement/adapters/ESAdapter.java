@@ -12,6 +12,7 @@ import com.example.alesm97.odeonmanagement.R;
 import com.example.alesm97.odeonmanagement.adapters.base.BaseAdapter;
 import com.example.alesm97.odeonmanagement.adapters.base.BaseViewHolder;
 import com.example.alesm97.odeonmanagement.models.Sesion;
+import com.example.alesm97.odeonmanagement.viewmodels.MainViewModel;
 
 public class ESAdapter extends BaseAdapter<Sesion,ESAdapter.ViewHolder> {
 
@@ -26,7 +27,6 @@ public class ESAdapter extends BaseAdapter<Sesion,ESAdapter.ViewHolder> {
             return sesion.equals(t1);
         }
     };
-
 
     public ESAdapter() {
         super (diffUtilCall);
