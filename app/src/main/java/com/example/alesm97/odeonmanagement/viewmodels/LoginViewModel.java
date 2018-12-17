@@ -32,7 +32,7 @@ public class LoginViewModel extends AndroidViewModel {
     public void loginButtonOnClick(View v){
         
         
-        if (pass.equals("")){
+        if (pass.isEmpty()){
             password = "-";
         }else{
             password = pass;
