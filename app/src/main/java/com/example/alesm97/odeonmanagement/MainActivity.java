@@ -1,8 +1,12 @@
 package com.example.alesm97.odeonmanagement;
 
 import android.annotation.TargetApi;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
+import android.content.Context;
 import android.databinding.DataBindingUtil;
 import android.os.Build;
 import android.os.Bundle;
@@ -11,6 +15,8 @@ import android.support.annotation.RequiresApi;
 import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.TextView;
@@ -18,6 +24,7 @@ import android.widget.Toast;
 
 import com.example.alesm97.odeonmanagement.adapters.base.BaseAdapter;
 import com.example.alesm97.odeonmanagement.databinding.ActivityMainBinding;
+import com.example.alesm97.odeonmanagement.models.Incidencia;
 import com.example.alesm97.odeonmanagement.models.Limpieza;
 import com.example.alesm97.odeonmanagement.models.Pasen;
 import com.example.alesm97.odeonmanagement.models.Sesion;
@@ -70,57 +77,48 @@ public class MainActivity extends AppCompatActivity {
 
         TextView lblMainHour = findViewById(R.id.lblMainHour);
         TextView lblMainFecha = findViewById(R.id.lblMainFecha);
-        FloatingActionButton btnLoad = findViewById(R.id.btnReload);
 
-        /*btnLoad.setOnClickListener(v -> {
-            if(viewmodel.pasenFragment.isVisible()){
-                viewmodel.setPasenData();
-            }else if(viewmodel.esFragment.isVisible()){
-                viewmodel.setEsData();
-            }
-        });*/
+
+
+        createChannel();
+
+
+
 
         viewmodel.watch.observe(this, lblMainHour::setText);
         viewmodel.fecha.observe(this, lblMainFecha::setText);
 
+        viewmodel.pasen.observe(this, sesions -> viewmodel.setPasenData());
 
+        viewmodel.entradas.observe(this, sesions -> viewmodel.esFragment.adapter.submitList(viewmodel.sortDataListE(sesions)));
+
+        viewmodel.salidas.observe(this, sesions -> viewmodel.esFragment.adapterSalida.submitList(viewmodel.sortDataListS(sesions)));
+
+        viewmodel.incidencias.observe(this, incidencias -> {
+            List<Incidencia> lista = new ArrayList<>();
+            for (Incidencia inci : incidencias){
+                if (inci.getCritico() == 1){
+                    Notification noti = new NotificationCompat.Builder(viewmodel.incidenciasFragment.getContext(),"OdeonManagement")
+                            .setSmallIcon(R.drawable.ic_incidencia_menu_item)
+                            .setContentTitle("Critico")
+                            .setContentText(inci.getMensaje())
+                            .build();
+                    NotificationManagerCompat manager = NotificationManagerCompat.from(viewmodel.incidenciasFragment.getContext());
+                    manager.notify(1457,noti);
+                    lista.add(inci);
+                }
+            }
+            viewmodel.incidenciasFragment.adapter.submitList(lista);
+        });
+
+        //meterDatos();
         //meterDatos2();
         recoverDataEs();
         recoverDataPasen();
+        recoverDataIncidencias();
 
         addFragments();
-
-        /*viewmodel.sesiones.observe(this, sesions -> {
-
-            viewmodel.changeDataLists(sesions);
-
-        });*/
-
-
-        viewmodel.pasen.observe(this, sesions -> {
-            viewmodel.setPasenData();
-        });
-
         changeToEsFragment();
-
-
-        viewmodel.entradas.observe(this, new Observer<List<Sesion>>() {
-            @Override
-            public void onChanged(@Nullable List<Sesion> sesions) {
-                viewmodel.esFragment.adapter.submitList(sesions);
-                //viewmodel.syncDataListE();
-            }
-        });
-
-        viewmodel.salidas.observe(this, new Observer<List<Sesion>>() {
-            @Override
-            public void onChanged(@Nullable List<Sesion> sesions) {
-                viewmodel.esFragment.adapterSalida.submitList(sesions);
-                //viewmodel.syncDataListS();
-            }
-        });
-
-        //viewmodel.threadLoadData();
 
         syncEsData();
 
@@ -168,6 +166,10 @@ public class MainActivity extends AppCompatActivity {
         transaction = getSupportFragmentManager().beginTransaction();
         transaction.add(R.id.frgLayout,viewmodel.pasenFragment).hide(viewmodel.pasenFragment);
         transaction.commit();
+
+        transaction = getSupportFragmentManager().beginTransaction();
+        transaction.add(R.id.frgLayout,viewmodel.incidenciasFragment);
+        transaction.commit();
     }
 
     private void recoverDataPasen() {
@@ -182,10 +184,22 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private void recoverDataIncidencias(){
+        FirebaseFirestore fb = FirebaseFirestore.getInstance();
+
+        fb.collection("incidencias").addSnapshotListener((queryDocumentSnapshots, e) -> {
+            List<Incidencia> lista = new ArrayList<>();
+            for (DocumentSnapshot object : queryDocumentSnapshots){
+                lista.add(object.toObject(Incidencia.class));
+            }
+            viewmodel.incidencias.postValue(lista);
+        });
+    }
+
     private void recoverDataEs() {
         FirebaseFirestore fb = FirebaseFirestore.getInstance();
 
-        fb.collection("entradas").whereEqualTo("anho",2018).whereEqualTo("mes",1).whereEqualTo("dia",15).addSnapshotListener((queryDocumentSnapshots, e) -> {
+        fb.collection("entradas").whereEqualTo("anho",2018).whereEqualTo("mes",12).whereEqualTo("dia",17).addSnapshotListener((queryDocumentSnapshots, e) -> {
             List<Sesion> lista = new ArrayList<>();
             for (DocumentSnapshot object : queryDocumentSnapshots){
                 lista.add(object.toObject(Sesion.class));
@@ -193,7 +207,7 @@ public class MainActivity extends AppCompatActivity {
             viewmodel.entradas.setValue(lista);
         });
 
-        fb.collection("salidas").whereEqualTo("anho",2018).whereEqualTo("mes",1).whereEqualTo("dia",15).addSnapshotListener((queryDocumentSnapshots, e) -> {
+        fb.collection("salidas").whereEqualTo("anho",2018).whereEqualTo("mes",12).whereEqualTo("dia",17).addSnapshotListener((queryDocumentSnapshots, e) -> {
             List<Sesion> lista = new ArrayList<>();
             for (DocumentSnapshot object : queryDocumentSnapshots){
                 lista.add(object.toObject(Sesion.class));
@@ -205,43 +219,34 @@ public class MainActivity extends AppCompatActivity {
     private void changeToEsFragment() {
         FragmentTransaction trans = getSupportFragmentManager().beginTransaction();
         if(!viewmodel.esFragment.isVisible()){
-            if(viewmodel.pasenFragment.isVisible()){
-                trans.hide(viewmodel.pasenFragment);
-                trans.show(viewmodel.esFragment);
-            }else{
-                // TODO agregar fragmento incidencias
-                trans.show(viewmodel.esFragment);
-            }
+            trans.hide(viewmodel.pasenFragment);
+            trans.hide(viewmodel.incidenciasFragment);
+            trans.show(viewmodel.esFragment);
         }
         trans.commit();
-        //viewmodel.setEsData();
     }
 
     private void changeToPasenFragment(){
         FragmentTransaction trans = getSupportFragmentManager().beginTransaction();
         if(!viewmodel.pasenFragment.isVisible()){
-            if(viewmodel.esFragment.isVisible()){
-                trans.hide(viewmodel.esFragment);
-                trans.show(viewmodel.pasenFragment);
-            }else{
-                trans.show(viewmodel.pasenFragment);
-            }
+            trans.hide(viewmodel.incidenciasFragment);
+            trans.hide(viewmodel.esFragment);
+            trans.show(viewmodel.pasenFragment);
         }
         trans.commit();
-        //viewmodel.setPasenData();
-    }
-
-    private void observeEsLists() {
-
-    }
-
-    private void changeToLimpiezaFragment(){
-        //getSupportFragmentManager().beginTransaction().replace(R.id.frgLayout,viewmodel.limpiezaFragment).commit();
-        //observeLimList();
     }
 
     private void changeToIncidenciasFragment(){
-        //getSupportFragmentManager().beginTransaction().replace(R.id.frgLayout,viewmodel.incidenciasFragment).commit();
+        FragmentTransaction trans = getSupportFragmentManager().beginTransaction();
+        if(!viewmodel.incidenciasFragment.isVisible()){
+            trans.hide(viewmodel.pasenFragment);
+            trans.hide(viewmodel.esFragment);
+            trans.show(viewmodel.incidenciasFragment);
+        }
+        trans.commit();
+    }
+    private void observeEsLists() {
+
     }
 
     public void meterDatos(){
@@ -249,34 +254,34 @@ public class MainActivity extends AppCompatActivity {
         List<Sesion> sesiones = new ArrayList<>();
         List<Limpieza> limpiezas = new ArrayList<>();
 
-        int hora = 10;
-        int minutos = 10;
-        int dia = 15;
+        int hora = 11;
+        //int minutos = 10;
+        int dia = 17;
 
         int[] anos = {2018,2018,2018,2018,2018,2018,2018,2018,2018,2018,2018,2018,2018,2018,2018};
-        int[] meses = {1,2,3,4,5,6,7,8,9,10,11,12,14,15};
-        int[] dias = {2,5,6,8,7,15,6,29,14,5,30,28,16,17,2};
-        int[] horas = {16,17,16,19,18,20,22,23,21,19,18,16,17,17,19};
-        //int[] minutos = {0,5,10,15,30,45,35,15,0,0,45,30,25,20,25};
+        int[] meses = {12,12,12,12,12,12,12,12,12,12,12,12,12,12,12};
+        int[] dias = {17,17,17,17,17,17,17,17,17,17,17,17,17,17,17};
+        //int[] horas = {11,11,11,11,11,11,11,11,11,11,11,11,11,11,11};
+        int[] minutos = {0,5,10,15,30,45,35,15,0,0,45,30,25,20,25};
         int[] sesion = {1,2,3,4,5,1,5,3,4,6,1,2,2,1,3};
         int[] sala = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
         String[] nombres = {"Pelicula 1","Pelicula 2","Pelicula 3","Pelicula 4","Pelicula 5","Pelicula 6","Pelicula 7","Pelicula 8","Pelicula 9","Pelicula 10","Pelicula 11","Pelicula 12","Pelicula 13","Pelicula 14","Pelicula 15"};
 
-        /*for (int i = 0; i < 14; i++){
-            sesiones.add(new Sesion(nombres[i],anos[0],meses[0],dia,hora,minutos+i,hora,minutos+i,sesion[i],sala[i]));
+        for (int i = 0; i < 14; i++){
+            sesiones.add(new Sesion(nombres[i],anos[0],meses[0],dia,hora,minutos[i],hora,minutos[i],sesion[i],sala[i]));
         }
 
         for(Sesion ses : sesiones){
             db.collection("sesiones").document(ses.getCodigo()).set(ses);
-        }*/
+        }
 
-        for (int i = 0; i < 14; i++){
+        /*for (int i = 0; i < 14; i++){
             limpiezas.add(new Limpieza(nombres[i],anos[0],meses[0],dia,hora,minutos+i,sala[i],sesion[i],false));
         }
 
         for(Limpieza ses : limpiezas){
             db.collection("limpiezas").document(ses.getCodigo()).set(ses);
-        }
+        }*/
 
         Toast.makeText(this, "Listo", Toast.LENGTH_SHORT).show();
 
@@ -330,6 +335,7 @@ public class MainActivity extends AppCompatActivity {
                         }
 
                         for (Sesion s : aEliminar) {
+                            db.collection("pasen").document(String.format("%d",s.getSala())).update("pasen", false);
                             db.collection("entradas").document(s.getCodigo()).delete();
                         }
 
@@ -347,6 +353,7 @@ public class MainActivity extends AppCompatActivity {
                             }
 
                             for (Sesion s : aEliminar) {
+                                db.collection("pasen").document(String.format("%d",s.getSala())).update("pasen", true);
                                 db.collection("salidas").document(s.getCodigo()).delete();
                             }
                         }
@@ -363,9 +370,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }).start();
     }
-
-
-
 
     public void launchSyncLists() {
         Thread syncE = new Thread(new Runnable() {
@@ -395,5 +399,19 @@ public class MainActivity extends AppCompatActivity {
         syncS.start();
     }
 
+    private void createChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            // Se crea el canal.
+            NotificationChannel notificationChannel = new NotificationChannel(
+                    "odeon_management",
+                    "OdeonManagement",
+                    NotificationManager.IMPORTANCE_DEFAULT);
+            notificationChannel.setDescription("OdeonManagement");
+            // Se registra el canal en el gestor de notificaciones
+            NotificationManager notificationManager =
+                    (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            notificationManager.createNotificationChannel(notificationChannel);
+        }
+    }
 
 }

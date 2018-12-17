@@ -13,7 +13,9 @@ import android.view.View;
 
 import com.example.alesm97.odeonmanagement.adapters.base.BaseAdapter;
 import com.example.alesm97.odeonmanagement.fragments.EsFragment;
+import com.example.alesm97.odeonmanagement.fragments.IncidenciasFragment;
 import com.example.alesm97.odeonmanagement.fragments.PasenFragment;
+import com.example.alesm97.odeonmanagement.models.Incidencia;
 import com.example.alesm97.odeonmanagement.models.Pasen;
 import com.example.alesm97.odeonmanagement.models.Sesion;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -37,6 +39,7 @@ public class MainViewModel extends AndroidViewModel {
 
     public MutableLiveData<List<Sesion>> entradas = new MutableLiveData<>();
     public MutableLiveData<List<Sesion>> salidas = new MutableLiveData<>();
+    public MutableLiveData<List<Incidencia>> incidencias = new MutableLiveData<>();
 
     private List<Pasen> listaPasen = new ArrayList<>();
 
@@ -44,6 +47,7 @@ public class MainViewModel extends AndroidViewModel {
 
     public EsFragment esFragment;
     public PasenFragment pasenFragment;
+    public IncidenciasFragment incidenciasFragment;
 
     public MutableLiveData<Filtro> filtro = new MutableLiveData<>();
 
@@ -55,11 +59,9 @@ public class MainViewModel extends AndroidViewModel {
 
         esFragment = new EsFragment();
         pasenFragment = new PasenFragment();
-
+        incidenciasFragment = new IncidenciasFragment();
 
         filtro.setValue(Filtro.TODAS);
-
-
     }
 
 
@@ -69,23 +71,10 @@ public class MainViewModel extends AndroidViewModel {
     }
 
 
-    public void changeFilter() {
-        if (filtro.getValue() == Filtro.PARES) {
-            //filtrarPares();
-        } else if (filtro.getValue() == Filtro.IMPARES) {
-            //filtrarImpares();
-        } else {
-            //filtrarTodas();
-        }
-    }
-
-
-    public void changeDataLists(List<Sesion> sesiones) {
+    public List<Sesion> sortDataListE(List<Sesion> sesiones) {
         if (sesiones != null) {
-            List<Sesion> list1 = new ArrayList<>(sesiones);
-            List<Sesion> list2 = new ArrayList<>(sesiones);
 
-            Collections.sort(list1, new Comparator<Sesion>() {
+            Collections.sort(sesiones, new Comparator<Sesion>() {
 
                 @Override
                 public int compare(Sesion o1, Sesion o2) {
@@ -99,53 +88,32 @@ public class MainViewModel extends AndroidViewModel {
                 }
             });
 
-            Collections.sort(list2, new Comparator<Sesion>() {
+
+        }
+        return sesiones;
+    }
+
+    public List<Sesion> sortDataListS(List<Sesion> sesiones) {
+        if (sesiones != null) {
+
+            Collections.sort(sesiones, new Comparator<Sesion>() {
 
                 @Override
                 public int compare(Sesion o1, Sesion o2) {
-                    int c = Integer.compare(o1.getHoraS(), o2.getHoraS());
+                    int c = Integer.compare(o1.getHoraE(), o2.getHoraE());
 
                     if (c == 0) {
-                        c = Integer.compare(o1.getMinutosS(), o2.getMinutosS());
+                        c = Integer.compare(o1.getMinutosE(), o2.getMinutosE());
                     }
 
                     return c;
                 }
             });
-
-            entradas.setValue(list1);
-            salidas.setValue(list2);
         }
 
+        return sesiones;
+
     }
-
-
-    /*public void launchSyncLists() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                syncDataListE();
-                try {
-                    Thread.sleep(5000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                syncDataListS();
-                try {
-                    Thread.sleep(5000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
-    }*/
-
 
     @TargetApi(Build.VERSION_CODES.O)
     public void syncDataListE() {
